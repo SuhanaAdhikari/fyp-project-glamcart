@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "cloudinary": "^2.6.0",
+    "javascript-time-ago": "^2.5.11",
+    "paypal-rest-sdk": "^1.8.1",
+    "react-simple-typewriter": "^5.0.1",
+    "sharp": "^0.34.1",
+    "streamifier": "^0.1.1"
+  }
+}
