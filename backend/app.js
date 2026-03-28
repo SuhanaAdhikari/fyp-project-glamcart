@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const ErrorHandler = require("./middleware/error");
 const app = express();
 const cookieParser = require("cookie-parser");
@@ -24,7 +25,7 @@ app.use("/test", (req, res) => {
 
 // ✅ Load environment variables
 if (process.env.NODE_ENV !== "PRODUCTION") {
-  require("dotenv").config({ path: "config/.env" });
+  require("dotenv").config({ path: path.join(__dirname, "config", ".env") });
 }
 
 // ✅ Import and mount all routes
