@@ -143,7 +143,7 @@ const CreateEvent = () => {
             </div>
 
             <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-2">
-              <FiCalendar className="text-pink-500" />
+              <FiCalendar className="text-[var(--color-accent-strong)]" />
               Create New Event
             </h2>
             <p className="text-sm text-gray-600 mt-1">Create GlamCart promotions with dates, stock and pricing.</p>
@@ -242,7 +242,7 @@ const CreateEvent = () => {
                 {/* Dates */}
                 <div className="rounded-xl border border-gray-200 bg-white p-5">
                   <p className="text-sm font-extrabold text-gray-900 mb-4 flex items-center gap-2">
-                    <FiCalendar className="text-pink-500" /> Event Dates
+                    <FiCalendar className="text-[var(--color-accent-strong)]" /> Event Dates
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -291,7 +291,7 @@ const CreateEvent = () => {
                 {/* Pricing */}
                 <div className="rounded-xl border border-gray-200 bg-white p-5">
                   <p className="text-sm font-extrabold text-gray-900 mb-4 flex items-center gap-2">
-                    <FiDollarSign className="text-pink-500" /> Pricing & Inventory
+                    <FiDollarSign className="text-[var(--color-accent-strong)]" /> Pricing & Inventory
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -446,8 +446,8 @@ const CreateEvent = () => {
             width: 10px;
             height: 10px;
             border-radius: 999px;
-            background: linear-gradient(90deg, #ec4899, #a855f7);
-            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+            box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.12);
             display: inline-block;
           }
 
@@ -493,11 +493,11 @@ const CreateEvent = () => {
           .gc_cardTopLine {
             height: 5px;
             width: 100%;
-            background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
           }
           .gc_cardHeader {
             padding: 16px 18px;
-            background: linear-gradient(90deg, rgba(236, 72, 153, 0.08), rgba(168, 85, 247, 0.08));
+            background: linear-gradient(90deg, rgba(234, 215, 200, 0.9), rgba(255, 255, 255, 0.9));
             border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           }
 
@@ -508,9 +508,9 @@ const CreateEvent = () => {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(236, 72, 153, 0.12);
-            border: 1px solid rgba(236, 72, 153, 0.22);
-            color: #111827;
+            background: var(--color-surface-soft);
+            border: 1px solid var(--color-border);
+            color: var(--color-accent-strong);
           }
 
           .gc_field {
@@ -546,8 +546,8 @@ const CreateEvent = () => {
             transition: 160ms ease;
           }
           .gc_input:focus {
-            border-color: rgba(168, 85, 247, 0.65);
-            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
+            border-color: rgba(166, 120, 97, 0.65);
+            box-shadow: 0 0 0 4px rgba(166, 120, 97, 0.15);
           }
           .gc_textarea {
             resize: vertical;
@@ -572,8 +572,8 @@ const CreateEvent = () => {
             transition: 160ms ease;
           }
           .gc_moneyInput:focus {
-            border-color: rgba(236, 72, 153, 0.65);
-            box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.14);
+            border-color: rgba(166, 120, 97, 0.65);
+            box-shadow: 0 0 0 4px rgba(166, 120, 97, 0.14);
           }
 
           .gc_pillInfo {
@@ -581,9 +581,9 @@ const CreateEvent = () => {
             font-weight: 900;
             padding: 6px 10px;
             border-radius: 999px;
-            background: linear-gradient(90deg, rgba(236, 72, 153, 0.14), rgba(168, 85, 247, 0.14));
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            color: #111827;
+            background: var(--color-accent-soft);
+            border: 1px solid rgba(166, 120, 97, 0.22);
+            color: var(--color-accent-strong);
             line-height: 1;
           }
 
@@ -601,8 +601,8 @@ const CreateEvent = () => {
             transition: 160ms ease;
           }
           .gc_dropzone:hover {
-            border-color: rgba(168, 85, 247, 0.6);
-            background: rgba(168, 85, 247, 0.06);
+            border-color: rgba(166, 120, 97, 0.6);
+            background: rgba(166, 120, 97, 0.06);
           }
           .gc_dropIcon {
             width: 52px;
@@ -611,9 +611,9 @@ const CreateEvent = () => {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(168, 85, 247, 0.12);
-            border: 1px solid rgba(168, 85, 247, 0.22);
-            color: #111827;
+            background: var(--color-surface-soft);
+            border: 1px solid var(--color-border);
+            color: var(--color-accent-strong);
           }
 
           .gc_smallBtn {
@@ -677,13 +677,13 @@ const CreateEvent = () => {
             border-radius: 16px;
             font-weight: 900;
             color: #fff;
-            background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
-            box-shadow: 0 10px 22px rgba(168, 85, 247, 0.22);
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+            box-shadow: 0 10px 22px rgba(136, 94, 74, 0.18);
             transition: 160ms ease;
           }
           .gc_submit:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 30px rgba(168, 85, 247, 0.26);
+            box-shadow: 0 14px 30px rgba(136, 94, 74, 0.22);
           }
           .gc_disabled {
             opacity: 0.7;

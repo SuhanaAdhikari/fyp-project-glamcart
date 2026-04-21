@@ -214,15 +214,15 @@ const ShopProfileData = ({ isOwner }) => {
       {/* GlamCart5 CSS */}
       <style jsx global>{`
         .gc5_topBar {
-          background: linear-gradient(90deg, #ec4899, #a855f7, #7c3aed);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
         }
 
         .gc5_glow {
           position: absolute;
           inset: -60px;
-          background: radial-gradient(circle at 18% 24%, rgba(236, 72, 153, 0.16), transparent 45%),
-            radial-gradient(circle at 72% 18%, rgba(168, 85, 247, 0.16), transparent 45%),
-            radial-gradient(circle at 60% 85%, rgba(124, 58, 237, 0.12), transparent 45%);
+          background: radial-gradient(circle at 18% 24%, rgba(166, 120, 97, 0.16), transparent 45%),
+            radial-gradient(circle at 72% 18%, rgba(136, 94, 74, 0.14), transparent 45%),
+            radial-gradient(circle at 60% 85%, rgba(234, 215, 200, 0.3), transparent 45%);
           pointer-events: none;
         }
 
@@ -230,8 +230,8 @@ const ShopProfileData = ({ isOwner }) => {
           width: 10px;
           height: 10px;
           border-radius: 999px;
-          background: linear-gradient(90deg, #ec4899, #a855f7);
-          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+          box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.12);
           display: inline-block;
         }
 
@@ -261,7 +261,7 @@ const ShopProfileData = ({ isOwner }) => {
           border-radius: 16px;
           font-weight: 900;
           color: #fff;
-          background: linear-gradient(90deg, #ec4899, #a855f7, #7c3aed);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
           box-shadow: 0 18px 30px rgba(17, 24, 39, 0.16);
           border: 1px solid rgba(255, 255, 255, 0.25);
           transition: 160ms ease;
@@ -289,13 +289,8 @@ const ShopProfileData = ({ isOwner }) => {
           box-shadow: 0 14px 28px rgba(17, 24, 39, 0.1);
         }
         .gc5_tabActive {
-          background: linear-gradient(
-            90deg,
-            rgba(236, 72, 153, 0.1),
-            rgba(168, 85, 247, 0.1),
-            rgba(124, 58, 237, 0.08)
-          );
-          border-color: rgba(168, 85, 247, 0.35);
+          background: linear-gradient(90deg, rgba(166, 120, 97, 0.12), rgba(234, 215, 200, 0.4));
+          border-color: rgba(166, 120, 97, 0.35);
           box-shadow: 0 16px 30px rgba(17, 24, 39, 0.12);
         }
 
@@ -310,7 +305,7 @@ const ShopProfileData = ({ isOwner }) => {
           color: #111827;
         }
         .gc5_tabIconActive {
-          background: linear-gradient(90deg, rgba(236, 72, 153, 0.18), rgba(168, 85, 247, 0.18));
+          background: linear-gradient(90deg, rgba(166, 120, 97, 0.18), rgba(234, 215, 200, 0.42));
           color: #111827;
         }
 
@@ -329,8 +324,8 @@ const ShopProfileData = ({ isOwner }) => {
           line-height: 1;
         }
         .gc5_tabCountActive {
-          background: linear-gradient(90deg, rgba(236, 72, 153, 0.16), rgba(168, 85, 247, 0.16));
-          border-color: rgba(168, 85, 247, 0.25);
+          background: linear-gradient(90deg, rgba(166, 120, 97, 0.16), rgba(234, 215, 200, 0.42));
+          border-color: rgba(166, 120, 97, 0.25);
         }
 
         .gc5_reviewCard {
@@ -339,12 +334,7 @@ const ShopProfileData = ({ isOwner }) => {
           padding: 14px;
           border-radius: 18px;
           border: 1px solid rgba(0, 0, 0, 0.08);
-          background: linear-gradient(
-            90deg,
-            rgba(236, 72, 153, 0.05),
-            rgba(168, 85, 247, 0.05),
-            rgba(124, 58, 237, 0.04)
-          );
+          background: linear-gradient(90deg, rgba(166, 120, 97, 0.08), rgba(250, 245, 239, 0.95));
           box-shadow: 0 12px 26px rgba(17, 24, 39, 0.08);
         }
 

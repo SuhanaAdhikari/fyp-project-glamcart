@@ -24,15 +24,24 @@ exports.isSeller = catchAsyncErrors(async (req, res, next) => {
     if (!token) return next(new ErrorHandler("Login required", 401));
   
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.seller = await Shop.findById(decoded.id);
+    const seller = await Shop.findById(decoded.id);
+    if (!seller) {
+        return next(new ErrorHandler("Seller not found", 404));
+    }
+    if (seller.isApproved === false) {
+        return next(new ErrorHandler("Your shop is pending admin approval", 403));
+    }
+    req.seller = seller;
     next();
   });
 
 
 exports.isAdmin = (...roles) => {
+    const allowedRoles = roles.map((role) => String(role).toLowerCase());
     return (req,res,next) => {
-        if(!roles.includes(req.user.role)){
-            return next(new ErrorHandler(`${req.user.role} can not access this resources!`))
+        const userRole = String(req.user?.role || "").toLowerCase();
+        if(!allowedRoles.includes(userRole)){
+            return next(new ErrorHandler(`${req.user?.role} can not access this resources!`))
         };
         next();
     }

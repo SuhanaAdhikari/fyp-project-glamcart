@@ -1,465 +1,331 @@
-import React from "react"
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { CardNumberElement, CardCvcElement, CardExpiryElement, useStripe, useElements } from "@stripe/react-stripe-js"
-import { useSelector } from "react-redux"
-import axios from "axios"
-import { server } from "../../server"
-import { toast } from "react-toastify"
-import { FiCreditCard, FiTruck, FiSmartphone } from "react-icons/fi"
+import React, { useEffect, useState } from "react";
+import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { server } from "../../server";
 
-const Payment = () => {
-  const [orderData, setOrderData] = useState([])
-  const [open, setOpen] = useState(false)
-  const [khaltiLoading, setKhaltiLoading] = useState(false)
-  const { user } = useSelector((state) => state.user)
-  const navigate = useNavigate()
-  const stripe = useStripe()
-  const elements = useElements()
+const stripeElementOptions = {
+  style: {
+    base: {
+      fontSize: "16px",
+      color: "#1f2937",
+      fontFamily: "Poppins, sans-serif",
+      "::placeholder": {
+        color: "#9ca3af",
+      },
+    },
+  },
+};
+
+const Payment = ({ stripePromise }) => {
+  const [orderData, setOrderData] = useState([]);
+  const [selectedMethod, setSelectedMethod] = useState("card");
+  const [khaltiLoading, setKhaltiLoading] = useState(false);
+  const { user } = useSelector((state) => state.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const orderData = JSON.parse(localStorage.getItem("latestOrder"))
-    setOrderData(orderData)
-    window.scrollTo(0, 0)
-  }, [])
+    const latestOrder = JSON.parse(localStorage.getItem("latestOrder"));
+    setOrderData(latestOrder);
+    window.scrollTo(0, 0);
+  }, []);
 
   const order = {
     cart: orderData?.cart,
     shippingAddress: orderData?.shippingAddress,
-    user: user && user,
+    user,
     totalPrice: orderData?.totalPrice,
-  }
+  };
 
   const paymentData = {
-    amount: Math.round(orderData?.totalPrice * 100),
+    amount: orderData?.totalPrice ? Math.round(Number(orderData.totalPrice || 0) * 100) : 0,
+  };
+
+  const clearCheckoutState = () => {
+    localStorage.setItem("cartItems", JSON.stringify([]));
+    localStorage.setItem("latestOrder", JSON.stringify([]));
+    window.location.reload();
+  };
+
+  if (!orderData?.cart?.length) {
+    return (
+      <section className="section-shell py-8">
+        <div className="surface-card p-6 text-center">
+          <h2 className="text-xl font-semibold text-[#1f2937]">No order data found</h2>
+          <p className="mt-4 text-sm text-[#6b7280]">
+            Please complete the checkout form before initiating payment.
+          </p>
+        </div>
+      </section>
+    );
   }
 
-  const paymentHandler = async (e) => {
-    e.preventDefault()
-    try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
+  const CardPaymentForm = ({ paymentData, order }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+
+    const paymentHandler = async (event) => {
+      event.preventDefault();
+
+      if (!stripePromise) {
+        toast.error("Stripe is not ready yet. Please refresh the page or choose another payment method.");
+        return;
       }
 
-      const { data } = await axios.post(`${server}/payment/process`, paymentData, config)
+      try {
+        const config = { headers: { "Content-Type": "application/json" } };
+        const response = await axios.post(`${server}/payment/process`, paymentData, config);
+        const clientSecret = response?.data?.client_secret;
 
-      const client_secret = data.client_secret
+        if (!stripe || !elements || !clientSecret) {
+          toast.error("Stripe is still loading. Please try again in a moment.");
+          return;
+        }
 
-      if (!stripe || !elements) return
-      const result = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-          card: elements.getElement(CardNumberElement),
-        },
-      })
+        const result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: elements.getElement(CardNumberElement),
+          },
+        });
 
-      if (result.error) {
-        toast.error(result.error.message)
-      } else {
+        if (result.error) {
+          toast.error(result.error.message);
+          return;
+        }
+
         if (result.paymentIntent.status === "succeeded") {
           order.paymentInfo = {
             id: result.paymentIntent.id,
             status: result.paymentIntent.status,
             type: "Credit Card",
-          }
+          };
 
-          await axios
-            .post(`${server}/order/create-order`, order, config)
-            .then((res) => {
-              setOpen(false)
-              navigate("/order/success")
-              toast.success("Order successful!")
-              localStorage.setItem("cartItems", JSON.stringify([]))
-              localStorage.setItem("latestOrder", JSON.stringify([]))
-              window.location.reload()
-            })
-            .catch((error) => {
-              toast.error("Something went wrong with your order")
-              console.error(error)
-            })
+          await axios.post(`${server}/order/create-order`, order, config);
+          toast.success("Order successful.");
+          navigate("/order/success");
+          clearCheckoutState();
         }
+      } catch (error) {
+        toast.error(error?.response?.data?.message || "Payment processing failed.");
       }
-    } catch (error) {
-      toast.error(error.message || "Payment processing failed")
-    }
-  }
+    };
 
-  const cashOnDeliveryHandler = async (e) => {
-    e.preventDefault()
+    return (
+      <form onSubmit={paymentHandler} className="mt-6 space-y-5">
+        <Field label="Name on card">
+          <input value={user?.name || ""} readOnly className="field-input bg-[#fbf8f3]" />
+        </Field>
 
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
+        <div className="grid gap-5 md:grid-cols-2">
+          <Field label="Card number">
+            <div className="field-input flex items-center">
+              <CardNumberElement options={stripeElementOptions} className="w-full" />
+            </div>
+          </Field>
 
-    order.paymentInfo = {
-      type: "Cash On Delivery",
-    }
+          <Field label="Expiry date">
+            <div className="field-input flex items-center">
+              <CardExpiryElement options={stripeElementOptions} className="w-full" />
+            </div>
+          </Field>
+        </div>
 
-    await axios
-      .post(`${server}/order/create-order`, order, config)
-      .then((res) => {
-        setOpen(false)
-        navigate("/order/success")
-        toast.success("Order successful!")
-        localStorage.setItem("cartItems", JSON.stringify([]))
-        localStorage.setItem("latestOrder", JSON.stringify([]))
-        window.location.reload()
-      })
-      .catch((error) => {
-        toast.error("Something went wrong with your order")
-        console.error(error)
-      })
-  }
+        <Field label="Security code">
+          <div className="field-input flex items-center">
+            <CardCvcElement options={stripeElementOptions} className="w-full" />
+          </div>
+        </Field>
 
-  const khaltiPaymentHandler = async (e) => {
-    e.preventDefault()
-    setKhaltiLoading(true)
+        <button type="submit" className="btn-primary !w-full">
+          Pay now
+        </button>
+      </form>
+    );
+  };
+
+  const cashOnDeliveryHandler = async (event) => {
+    event.preventDefault();
 
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      const config = { headers: { "Content-Type": "application/json" } };
+      order.paymentInfo = { type: "Cash On Delivery" };
+      await axios.post(`${server}/order/create-order`, order, config);
+      toast.success("Order successful.");
+      navigate("/order/success");
+      clearCheckoutState();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Unable to place the order.");
+    }
+  };
 
-      // Prepare order data for Khalti
+  const khaltiPaymentHandler = async (event) => {
+    event.preventDefault();
+    if (!orderData?.cart?.length || !orderData?.totalPrice) {
+      toast.error("Unable to initiate Khalti payment. Please complete checkout and try again.");
+      return;
+    }
+
+    setKhaltiLoading(true);
+
+    try {
+      const config = { headers: { "Content-Type": "application/json" } };
       const khaltiOrderData = {
         cart: orderData?.cart,
         shippingAddress: orderData?.shippingAddress,
-        user: user,
+        user,
         totalPrice: orderData?.totalPrice,
         customerInfo: {
           name: user?.name,
           email: user?.email,
-          phone: user?.phoneNumber
-        }
+          phone: String(user?.phoneNumber || ""),
+        },
+      };
+
+      const response = await axios.post(`${server}/order/create-order-khalti`, khaltiOrderData, config);
+
+      if (!response?.data?.success) {
+        toast.error("Failed to initiate Khalti payment.");
+        return;
       }
 
-      // Create order with Khalti
-      const { data } = await axios.post(`${server}/order/create-order-khalti`, khaltiOrderData, config)
-
-      if (data.success) {
-        // Store order IDs for verification later
-        const orderIds = data.orders.map(order => order._id).join(',')
-        localStorage.setItem("khaltiOrderIds", orderIds)
-        localStorage.setItem("khaltiPidx", data.khalti.pidx)
-
-        // Redirect to Khalti payment page
-        window.location.href = data.khalti.payment_url
-      } else {
-        toast.error("Failed to initiate Khalti payment")
-      }
+      const orderIds = response.data.orders.map((item) => item._id).join(",");
+      localStorage.setItem("khaltiOrderIds", orderIds);
+      localStorage.setItem("khaltiPidx", response.data.khalti.pidx);
+      window.location.href = response.data.khalti.payment_url;
     } catch (error) {
-      console.error("Khalti payment error:", error)
-      toast.error(error.response?.data?.message || "Failed to initiate Khalti payment")
+      toast.error(error?.response?.data?.message || "Failed to initiate Khalti payment.");
     } finally {
-      setKhaltiLoading(false)
+      setKhaltiLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="w-full bg-[#f0f4fa] min-h-screen py-8">
-      <div className="w-[95%] 1000px:w-[85%] m-auto">
-        <div className="w-full block 800px:flex gap-8 mt-8">
-          <div className="w-full 800px:w-[65%]">
-            <PaymentInfo
-              user={user}
-              open={open}
-              setOpen={setOpen}
-              paymentHandler={paymentHandler}
-              cashOnDeliveryHandler={cashOnDeliveryHandler}
-              khaltiPaymentHandler={khaltiPaymentHandler}
-              khaltiLoading={khaltiLoading}
+    <section className="section-shell py-8">
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+        <div className="surface-card p-6">
+          <h2 className="text-xl font-semibold text-[#1f2937]">Choose payment method</h2>
+          <p className="mt-1 text-sm text-[#6b7280]">Select one payment option and complete the order.</p>
+
+          <div className="mt-6 grid gap-4">
+            <MethodButton
+              active={selectedMethod === "card"}
+              title="Credit or debit card"
+              description="Pay securely with Stripe."
+              onClick={() => setSelectedMethod("card")}
+            />
+            <MethodButton
+              active={selectedMethod === "khalti"}
+              title="Khalti"
+              description="Pay using the Khalti wallet flow."
+              onClick={() => setSelectedMethod("khalti")}
+            />
+            <MethodButton
+              active={selectedMethod === "cod"}
+              title="Cash on delivery"
+              description="Pay when your order arrives."
+              onClick={() => setSelectedMethod("cod")}
             />
           </div>
-          <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
-            <CartData orderData={orderData} />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
-const PaymentInfo = ({ 
-  user, 
-  open, 
-  setOpen, 
-  paymentHandler, 
-  cashOnDeliveryHandler, 
-  khaltiPaymentHandler, 
-  khaltiLoading 
-}) => {
-  const [select, setSelect] = useState(1)
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-md border border-[#dce5f3]">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-[#f0f4fa] p-2 rounded-full">
-          <FiCreditCard className="text-[#3d569a] text-xl" />
-        </div>
-        <h2 className="text-xl font-bold text-[#1a2240]">Payment Method</h2>
-      </div>
-
-      {/* Payment Options */}
-      <div className="space-y-6">
-        {/* Credit Card Option */}
-        <div className="border-b border-[#dce5f3] pb-6">
-          <div className="flex items-center gap-3 cursor-pointer mb-4" onClick={() => setSelect(1)}>
-            <div className="w-6 h-6 rounded-full border-2 border-[#3d569a] flex items-center justify-center">
-              {select === 1 && <div className="w-3 h-3 bg-[#3d569a] rounded-full" />}
-            </div>
-            <div className="flex items-center gap-2">
-              <FiCreditCard className="text-[#334580]" />
-              <span className="font-medium text-[#1a2240]">Pay with Credit/Debit Card</span>
-            </div>
-          </div>
-
-          {select === 1 && (
-            <div className="pl-9">
-              <form className="w-full space-y-4" onSubmit={paymentHandler}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[#334580] font-medium mb-2">Name On Card</label>
-                    <input
-                      required
-                      placeholder={user && user.name}
-                      className="w-full px-4 py-3 rounded-lg border border-[#dce5f3] focus:outline-none focus:ring-2 focus:ring-[#3d569a]"
-                      value={user && user.name}
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#334580] font-medium mb-2">Expiration Date</label>
-                    <CardExpiryElement
-                      className="w-full px-4 py-3 rounded-lg border border-[#dce5f3] focus:outline-none focus:ring-2 focus:ring-[#3d569a]"
-                      options={{
-                        style: {
-                          base: {
-                            fontSize: "16px",
-                            lineHeight: "42px",
-                            color: "#1a2240",
-                          },
-                          empty: {
-                            color: "#334580",
-                            backgroundColor: "transparent",
-                            "::placeholder": {
-                              color: "#6a8cca",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </div>
+          {selectedMethod === "card" && (
+            stripePromise ? (
+              <CardPaymentForm paymentData={paymentData} order={order} />
+            ) : (
+              <div className="mt-6 space-y-4">
+                <div className="surface-card-sm bg-[#fff7ed] p-4 text-sm text-[#9a3412]">
+                  Stripe is not available right now. Please reload the page or use Khalti / Cash on Delivery.
                 </div>
+              </div>
+            )
+          )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[#334580] font-medium mb-2">Card Number</label>
-                    <CardNumberElement
-                      className="w-full px-4 py-3 rounded-lg border border-[#dce5f3] focus:outline-none focus:ring-2 focus:ring-[#3d569a]"
-                      options={{
-                        style: {
-                          base: {
-                            fontSize: "16px",
-                            lineHeight: "42px",
-                            color: "#1a2240",
-                          },
-                          empty: {
-                            color: "#334580",
-                            backgroundColor: "transparent",
-                            "::placeholder": {
-                              color: "#6a8cca",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#334580] font-medium mb-2">CVV</label>
-                    <CardCvcElement
-                      className="w-full px-4 py-3 rounded-lg border border-[#dce5f3] focus:outline-none focus:ring-2 focus:ring-[#3d569a]"
-                      options={{
-                        style: {
-                          base: {
-                            fontSize: "16px",
-                            lineHeight: "42px",
-                            color: "#1a2240",
-                          },
-                          empty: {
-                            color: "#334580",
-                            backgroundColor: "transparent",
-                            "::placeholder": {
-                              color: "#6a8cca",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </div>
-                </div>
+          {selectedMethod === "khalti" && (
+            <form onSubmit={khaltiPaymentHandler} className="mt-6 space-y-4">
+              <div className="surface-card-sm bg-[#fbf8f3] p-4 text-sm text-[#6b7280]">
+                You will be redirected to Khalti to complete the payment securely.
+              </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-[#3d569a] hover:bg-[#2d3a69] text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <FiCreditCard />
-                  Pay Now
-                </button>
-              </form>
-            </div>
+              <button type="submit" disabled={khaltiLoading} className="btn-primary !w-full">
+                {khaltiLoading ? "Processing..." : "Pay with Khalti"}
+              </button>
+            </form>
+          )}
+
+          {selectedMethod === "cod" && (
+            <form onSubmit={cashOnDeliveryHandler} className="mt-6 space-y-4">
+              <div className="surface-card-sm bg-[#fbf8f3] p-4 text-sm text-[#6b7280]">
+                Cash on delivery is available for eligible orders inside Nepal.
+              </div>
+
+              <button type="submit" className="btn-primary !w-full">
+                Confirm order
+              </button>
+            </form>
           )}
         </div>
 
-        {/* Khalti Payment Option */}
-        <div className="border-b border-[#dce5f3] pb-6">
-          <div className="flex items-center gap-3 cursor-pointer mb-4" onClick={() => setSelect(2)}>
-            <div className="w-6 h-6 rounded-full border-2 border-[#3d569a] flex items-center justify-center">
-              {select === 2 && <div className="w-3 h-3 bg-[#3d569a] rounded-full" />}
-            </div>
-            <div className="flex items-center gap-2">
-              <FiSmartphone className="text-[#334580]" />
-              <span className="font-medium text-[#1a2240]">Pay with Khalti</span>
-              <div className="bg-gradient-to-r from-[#5D2C91] to-[#7B61FF] text-white text-xs px-2 py-1 rounded-full">
-                Digital Wallet
-              </div>
-            </div>
+        <div className="surface-card h-fit p-6 lg:sticky lg:top-24">
+          <h2 className="text-xl font-semibold text-[#1f2937]">Order summary</h2>
+          <div className="mt-5 space-y-3 text-sm text-[#6b7280]">
+            <SummaryLine label="Subtotal" value={`Rs. ${Number(orderData?.subTotalPrice || 0).toLocaleString()}`} />
+            <SummaryLine label="Shipping" value={`Rs. ${Number(orderData?.shipping || 0).toFixed(2)}`} />
+            <SummaryLine
+              label="Discount"
+              value={
+                orderData?.discountPrice ? `Rs. ${Number(orderData.discountPrice).toLocaleString()}` : "Not applied"
+              }
+            />
           </div>
 
-          {select === 2 && (
-            <div className="pl-9">
-              <div className="bg-gradient-to-r from-[#5D2C91]/10 to-[#7B61FF]/10 p-4 rounded-lg mb-4 border border-[#7B61FF]/20">
-                <div className="flex items-center gap-3 mb-3">
-                  <img 
-                    src="https://khalti.s3.ap-south-1.amazonaws.com/website/khalti-logo-white.png" 
-                    alt="Khalti" 
-                    className="h-8 bg-[#5D2C91] px-3 py-1 rounded"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-[#1a2240]">Pay with Khalti Digital Wallet</h4>
-                    <p className="text-sm text-[#334580]">Fast, secure, and convenient payment</p>
-                  </div>
-                </div>
-                <div className="text-sm text-[#334580] space-y-1">
-                  <p>• Pay using Khalti balance, bank account, or cards</p>
-                  <p>• No extra charges for digital wallet payments</p>
-                  <p>• Instant payment confirmation</p>
-                </div>
-              </div>
+          <div className="app-divider my-5" />
 
-              <form onSubmit={khaltiPaymentHandler}>
-                <button
-                  type="submit"
-                  disabled={khaltiLoading}
-                  className="w-full bg-gradient-to-r from-[#5D2C91] to-[#7B61FF] hover:from-[#4A1D7A] hover:to-[#6B4EE6] text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {khaltiLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <FiSmartphone />
-                      Pay with Khalti
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-          )}
-        </div>
-
-        {/* Cash on Delivery Option */}
-        <div>
-          <div className="flex items-center gap-3 cursor-pointer mb-4" onClick={() => setSelect(3)}>
-            <div className="w-6 h-6 rounded-full border-2 border-[#3d569a] flex items-center justify-center">
-              {select === 3 && <div className="w-3 h-3 bg-[#3d569a] rounded-full" />}
-            </div>
-            <div className="flex items-center gap-2">
-              <FiTruck className="text-[#334580]" />
-              <span className="font-medium text-[#1a2240]">Cash on Delivery</span>
-            </div>
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-[#1f2937]">Total</span>
+            <span className="text-2xl font-bold text-[#1f2937]">Rs. {Number(orderData?.totalPrice || 0).toFixed(2)}</span>
           </div>
 
-          {select === 3 && (
-            <div className="pl-9">
-              <div className="bg-[#f0f4fa] p-4 rounded-lg mb-4">
-                <p className="text-[#334580] text-sm">
-                  Pay with cash upon delivery. Please have the exact amount ready when your order arrives.
-                </p>
-              </div>
-
-              <form onSubmit={cashOnDeliveryHandler}>
-                <button
-                  type="submit"
-                  className="w-full bg-[#3d569a] hover:bg-[#2d3a69] text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  Confirm Order
-                </button>
-              </form>
-            </div>
-          )}
+          <div className="surface-card-sm mt-5 bg-[#fbf8f3] p-4 text-sm text-[#6b7280]">
+            <p className="font-medium text-[#1f2937]">Delivery address</p>
+            <p className="mt-2">
+              {orderData?.shippingAddress?.address1}
+              {orderData?.shippingAddress?.address2 ? `, ${orderData.shippingAddress.address2}` : ""}
+              {orderData?.shippingAddress?.city ? `, ${orderData.shippingAddress.city}` : ""}
+              {orderData?.shippingAddress?.zipCode ? ` - ${orderData.shippingAddress.zipCode}` : ""}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
+    </section>
+  );
+};
 
-const CartData = ({ orderData }) => {
-  const shipping = orderData?.shipping?.toFixed(2)
+const MethodButton = ({ active, title, description, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`rounded-[20px] border p-4 text-left transition ${
+      active ? "border-[#1f2937] bg-[#1f2937] text-white" : "border-[#e6ddd2] bg-[#fbf8f3] text-[#1f2937]"
+    }`}
+  >
+    <p className="font-semibold">{title}</p>
+    <p className={`mt-1 text-sm ${active ? "text-white/80" : "text-[#6b7280]"}`}>{description}</p>
+  </button>
+);
 
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-md border border-[#dce5f3]">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-[#f0f4fa] p-2 rounded-full">
-          <FiCreditCard className="text-[#3d569a] text-xl" />
-        </div>
-        <h2 className="text-xl font-bold text-[#1a2240]">Order Summary</h2>
-      </div>
+const Field = ({ label, children }) => (
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#1f2937]">{label}</label>
+    {children}
+  </div>
+);
 
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <span className="text-[#334580]">Subtotal:</span>
-          <span className="font-semibold text-[#1a2240]">Rs.{orderData?.subTotalPrice?.toLocaleString()}</span>
-        </div>
+const SummaryLine = ({ label, value }) => (
+  <div className="flex items-center justify-between">
+    <span>{label}</span>
+    <span className="font-semibold text-[#1f2937]">{value}</span>
+  </div>
+);
 
-        <div className="flex justify-between items-center">
-          <span className="text-[#334580]">Shipping:</span>
-          <span className="font-semibold text-[#1a2240]">Rs.{shipping}</span>
-        </div>
-
-        <div className="flex justify-between items-center">
-          <span className="text-[#334580]">Discount:</span>
-          <span className="font-semibold text-[#1a2240]">
-            {orderData?.discountPrice ? `Rs.${orderData.discountPrice}` : "-"}
-          </span>
-        </div>
-
-        <div className="border-t border-[#dce5f3] pt-4 mt-4">
-          <div className="flex justify-between items-center">
-            <span className="text-lg font-medium text-[#1a2240]">Total:</span>
-            <span className="text-xl font-bold text-[#1a2240]">Rs.{orderData?.totalPrice}</span>
-          </div>
-        </div>
-
-        <div className="bg-[#f0f4fa] p-4 rounded-lg mt-2">
-          <div className="flex items-center gap-2 mb-2">
-            <FiTruck className="text-[#3d569a]" />
-            <span className="font-medium text-[#1a2240]">Delivery Address</span>
-          </div>
-          <p className="text-sm text-[#334580]">
-            {orderData?.shippingAddress?.address1}, {orderData?.shippingAddress?.address2},
-            {orderData?.shippingAddress?.city}, Nepal - {orderData?.shippingAddress?.zipCode}
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default Payment
+export default Payment;

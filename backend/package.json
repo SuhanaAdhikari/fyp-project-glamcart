@@ -1,5 +1,5 @@
 {
-  "name": "Shoe-Sphere",
+  "name": "GlamCart",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -8,9 +8,10 @@
   },
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "postinstall": "node scripts/patch-buffer-equal-constant-time.js"
   },
-  "author": "Abishkar Chapagain",
+  "author": "Suhana Adhikari",
   "dependencies": {
     "axios": "^1.9.0",
     "bcrypt": "^5.1.0",

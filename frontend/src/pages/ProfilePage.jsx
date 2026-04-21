@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Header from "../components/Layout/Header";
-import styles from "../styles/styles";
 import Loader from "../components/Layout/Loader";
 import ProfileSideBar from "../components/Profile/ProfileSidebar";
 import ProfileContent from "../components/Profile/ProfileContent";
@@ -17,11 +16,28 @@ const ProfilePage = () => {
       ) : (
         <>
           <Header />
-          <div className={`${styles.section} flex bg-[#f5f5f5] py-10`}>
-            <div className="w-[50px] 800px:w-[335px] sticky 800px:mt-0 mt-[18%]">
-              <ProfileSideBar active={active} setActive={setActive} />
+          <div className="page-shell profile-shell">
+            <div className="workspace-body">
+              <div className="surface-card accent-panel mb-5 p-6 md:p-8">
+                <span className="workspace-kicker">Account center</span>
+                <h1 className="section-heading mt-4 text-[2.2rem] md:text-[3rem]">Profile, orders and security</h1>
+                <p className="section-copy mt-3 max-w-3xl">
+                  Everything tied to your account now sits inside one lighter, cleaner workspace.
+                </p>
+              </div>
+
+              <div className="workspace-grid">
+                <div className="workspace-sidebar">
+                  <ProfileSideBar active={active} setActive={setActive} />
+                </div>
+
+                <div className="workspace-main">
+                  <div className="workspace-content">
+                    <ProfileContent active={active} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <ProfileContent active={active} />
           </div>
         </>
       )}

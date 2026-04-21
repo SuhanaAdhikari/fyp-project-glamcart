@@ -30,12 +30,7 @@ export const loadSeller = () => async (dispatch) => {
       type: "LoadSellerRequest",
     });
 
-    const token = localStorage.getItem("token"); // get token from localStorage
-
     const { data } = await axios.get(`${server}/shop/getSeller`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
       withCredentials: true,
     });
 

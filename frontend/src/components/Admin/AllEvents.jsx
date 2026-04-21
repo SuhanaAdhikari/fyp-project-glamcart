@@ -89,12 +89,12 @@ const AllEvents = () => {
       flex: 1.4,
       renderCell: (params) => (
         <div className="flex items-center gap-3">
-          <span className="h-10 w-10 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-900">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] text-[var(--color-accent-strong)]">
             <FiCalendar size={18} />
           </span>
           <div className="leading-tight">
-            <div className="font-semibold text-gray-900">{params.value}</div>
-            <div className="text-xs text-gray-500">Promotion event</div>
+            <div className="font-semibold text-[var(--color-text)]">{params.value}</div>
+            <div className="text-xs text-[var(--color-muted)]">Promotion event</div>
           </div>
         </div>
       ),
@@ -109,14 +109,14 @@ const AllEvents = () => {
         const v = params.value
         const cls =
           v === "Active"
-            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+            ? "status-chip status-chip--success"
             : v === "Upcoming"
-              ? "bg-blue-50 text-blue-700 ring-1 ring-blue-200"
+              ? "status-chip status-chip--primary"
               : v === "Ended"
-                ? "bg-gray-100 text-gray-700 ring-1 ring-gray-200"
-                : "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+                ? "status-chip status-chip--muted"
+                : "status-chip status-chip--neutral"
 
-        return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${cls}`}>{v}</span>
+        return <span className={cls}>{v}</span>
       },
     },
 
@@ -127,7 +127,7 @@ const AllEvents = () => {
       flex: 0.7,
       type: "number",
       valueFormatter: (p) => `Rs. ${p.value}`,
-      renderCell: (params) => <span className="font-semibold text-gray-900">Rs. {params.value}</span>,
+      renderCell: (params) => <span className="font-semibold text-[var(--color-text)]">Rs. {params.value}</span>,
     },
 
     {
@@ -140,15 +140,15 @@ const AllEvents = () => {
         const v = Number(params.value || 0)
         const cls =
           v === 0
-            ? "bg-rose-50 text-rose-700 ring-1 ring-rose-200"
+            ? "status-chip status-chip--danger"
             : v < 10
-              ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
-              : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+              ? "status-chip status-chip--muted"
+              : "status-chip status-chip--success"
         const label = v === 0 ? "Out" : v < 10 ? "Low" : "In stock"
         return (
           <div className="flex items-center gap-2">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${cls}`}>{label}</span>
-            <span className="text-sm font-semibold text-gray-900">{v}</span>
+            <span className={cls}>{label}</span>
+            <span className="text-sm font-semibold text-[var(--color-text)]">{v}</span>
           </div>
         )
       },
@@ -162,8 +162,8 @@ const AllEvents = () => {
       minWidth: 140,
       flex: 0.7,
       renderCell: (params) => (
-        <div className="flex items-center gap-2 text-gray-700">
-          <FiClock className="text-gray-500" />
+        <div className="flex items-center gap-2 text-[var(--color-muted)]">
+          <FiClock className="text-[var(--color-muted)]" />
           <span className="font-medium">{params.value}</span>
         </div>
       ),
@@ -175,8 +175,8 @@ const AllEvents = () => {
       minWidth: 140,
       flex: 0.7,
       renderCell: (params) => (
-        <div className="flex items-center gap-2 text-gray-700">
-          <FiClock className="text-gray-500" />
+        <div className="flex items-center gap-2 text-[var(--color-muted)]">
+          <FiClock className="text-[var(--color-muted)]" />
           <span className="font-medium">{params.value}</span>
         </div>
       ),
@@ -190,8 +190,8 @@ const AllEvents = () => {
       sortable: false,
       renderCell: (params) => (
         <Link to={`/event/${params.id}`}>
-          <button className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition">
-            <FiEye size={18} className="text-gray-900" />
+          <button className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0">
+            <FiEye size={18} className="text-[var(--color-text)]" />
           </button>
         </Link>
       ),
@@ -206,9 +206,9 @@ const AllEvents = () => {
       renderCell: (params) => (
         <button
           onClick={() => setDeleteConfirm({ show: true, id: params.id })}
-          className="h-10 w-10 rounded-xl hover:bg-rose-50 flex items-center justify-center transition"
+          className="btn-danger !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
         >
-          <FiTrash2 size={18} className="text-rose-600" />
+          <FiTrash2 size={18} />
         </button>
       ),
     },
@@ -238,23 +238,23 @@ const AllEvents = () => {
       ) : (
         <div className="w-full p-4 md:p-6">
           {/* Header */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm mb-5">
+          <div className="surface-card mb-5">
             <div className="px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="text-[22px] md:text-[26px] font-semibold text-gray-900">All Events</h2>
-                <p className="text-sm text-gray-500 mt-1">Manage promotions and special offers.</p>
+                <h2 className="text-[22px] md:text-[26px] font-semibold text-[var(--color-text)]">All Events</h2>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">Manage promotions and special offers.</p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                  <span className="status-chip status-chip--neutral">
                     Total: {total}
                   </span>
 
                   <button
                     onClick={() => setDateFilter("active")}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ring-1 transition ${
+                    className={`status-chip transition ${
                       dateFilter === "active"
-                        ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                        : "bg-white text-gray-700 ring-gray-200 hover:bg-gray-50"
+                        ? "status-chip--success"
+                        : "status-chip--muted"
                     }`}
                   >
                     Active: {active}
@@ -262,10 +262,10 @@ const AllEvents = () => {
 
                   <button
                     onClick={() => setDateFilter("upcoming")}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ring-1 transition ${
+                    className={`status-chip transition ${
                       dateFilter === "upcoming"
-                        ? "bg-blue-50 text-blue-700 ring-blue-200"
-                        : "bg-white text-gray-700 ring-gray-200 hover:bg-gray-50"
+                        ? "status-chip--primary"
+                        : "status-chip--muted"
                     }`}
                   >
                     Upcoming: {upcoming}
@@ -273,10 +273,10 @@ const AllEvents = () => {
 
                   <button
                     onClick={() => setDateFilter("ended")}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ring-1 transition ${
+                    className={`status-chip transition ${
                       dateFilter === "ended"
-                        ? "bg-gray-100 text-gray-800 ring-gray-200"
-                        : "bg-white text-gray-700 ring-gray-200 hover:bg-gray-50"
+                        ? "status-chip--neutral"
+                        : "status-chip--muted"
                     }`}
                   >
                     Ended: {ended}
@@ -284,8 +284,8 @@ const AllEvents = () => {
 
                   <button
                     onClick={() => setDateFilter("all")}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ring-1 transition ${
-                      dateFilter === "all" ? "bg-black text-white ring-black" : "bg-white text-gray-700 ring-gray-200"
+                    className={`status-chip transition ${
+                      dateFilter === "all" ? "status-chip--strong" : "status-chip--muted"
                     }`}
                   >
                     All
@@ -295,7 +295,7 @@ const AllEvents = () => {
 
               <Link
                 to="/dashboard-create-event"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-black text-white hover:opacity-90 text-sm font-semibold transition"
+                className="btn-primary"
               >
                 <FiPlus size={16} />
                 Create Event
@@ -304,24 +304,24 @@ const AllEvents = () => {
 
             {/* Search */}
             <div className="px-5 pb-5 md:px-6">
-              <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 h-12">
-                <FiSearch className="text-gray-500" />
+              <div className="flex h-12 items-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4">
+                <FiSearch className="text-[var(--color-muted)]" />
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Search events by name or ID..."
-                  className="w-full outline-none bg-transparent text-sm text-gray-900 placeholder:text-gray-400"
+                  className="w-full bg-transparent text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-muted)]"
                 />
               </div>
             </div>
           </div>
 
           {/* Table */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="surface-card overflow-hidden">
             <div className="px-5 py-4 md:px-6 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Event List</h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <h3 className="text-lg font-semibold text-[var(--color-text)]">Event List</h3>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">
                   Showing {rows.length} of {total}
                 </p>
               </div>
@@ -330,23 +330,23 @@ const AllEvents = () => {
             <div className="px-2 md:px-4 pb-4">
               {rows.length === 0 ? (
                 <div className="py-14 text-center">
-                  <div className="mx-auto h-14 w-14 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-900">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] text-[var(--color-accent-strong)]">
                     <FiCalendar size={26} />
                   </div>
-                  <h4 className="mt-4 text-lg font-semibold text-gray-900">No events found</h4>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <h4 className="mt-4 text-lg font-semibold text-[var(--color-text)]">No events found</h4>
+                  <p className="mt-2 text-sm text-[var(--color-muted)]">
                     {q ? `No events matching "${q}".` : "Create your first event to attract customers with offers."}
                   </p>
                   <Link
                     to="/dashboard-create-event"
-                    className="mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-black text-white hover:opacity-90 text-sm font-semibold transition"
+                    className="btn-primary mt-5"
                   >
                     <FiPlus size={16} />
                     Create Event
                   </Link>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="surface-card-sm overflow-hidden bg-white">
                   <DataGrid rows={rows} columns={columns} pageSize={10} disableSelectionOnClick autoHeight sx={gridSx} />
                 </div>
               )}
@@ -356,25 +356,25 @@ const AllEvents = () => {
           {/* Delete Modal */}
           {deleteConfirm.show && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-2xl p-6">
-                <div className="mx-auto h-14 w-14 rounded-2xl bg-rose-50 flex items-center justify-center">
-                  <FiTrash2 size={24} className="text-rose-600" />
+              <div className="surface-card w-full max-w-md p-6">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#dcc0b4] bg-[#f3e2dc] text-[#8d4e3c]">
+                  <FiTrash2 size={24} />
                 </div>
-                <h3 className="mt-4 text-xl font-semibold text-gray-900 text-center">Delete event?</h3>
-                <p className="mt-2 text-sm text-gray-500 text-center">
+                <h3 className="mt-4 text-center text-xl font-semibold text-[var(--color-text)]">Delete event?</h3>
+                <p className="mt-2 text-center text-sm text-[var(--color-muted)]">
                   This action cannot be undone. The event will be removed permanently.
                 </p>
 
                 <div className="mt-6 flex gap-3">
                   <button
                     onClick={() => setDeleteConfirm({ show: false, id: null })}
-                    className="flex-1 h-11 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-semibold transition"
+                    className="btn-secondary !h-11 !w-full"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => handleDelete(deleteConfirm.id)}
-                    className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold transition"
+                    className="btn-danger !h-11 !w-full"
                   >
                     Delete
                   </button>

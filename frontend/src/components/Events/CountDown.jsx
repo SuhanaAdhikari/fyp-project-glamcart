@@ -1,63 +1,57 @@
-import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
-import { server } from "../../server";
+import React, { useEffect, useState } from "react";
 
-const CountDown = ({ data }) => {
-  const [timeLeft, setTimeLeft] = useState({});
-  const [isDeleted, setIsDeleted] = useState(false);
+const getTimeLeft = (finishDate) => {
+  if (!finishDate) return { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
 
-  const calculateTimeLeft = useCallback(() => {
-    if (!data?.Finish_Date) return { total: 0 };
-    const difference = new Date(data.Finish_Date) - new Date();
+  const difference = new Date(finishDate) - new Date();
 
-    return {
-      total: difference,
-      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60),
-    };
-  }, [data?.Finish_Date]);
+  if (difference <= 0) {
+    return { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
+
+  return {
+    total: difference,
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / 1000 / 60) % 60),
+    seconds: Math.floor((difference / 1000) % 60),
+  };
+};
+
+const CountDown = ({ data, onTimeUpChange }) => {
+  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(data?.Finish_Date));
 
   useEffect(() => {
-    setTimeLeft(calculateTimeLeft());
+    const updateTime = () => {
+      const nextValue = getTimeLeft(data?.Finish_Date);
+      setTimeLeft(nextValue);
+      if (onTimeUpChange) onTimeUpChange(nextValue.total <= 0);
+    };
 
-    const timer = setInterval(() => {
-      const updatedTimeLeft = calculateTimeLeft();
-      setTimeLeft(updatedTimeLeft);
-
-      if (updatedTimeLeft.total <= 0 && !isDeleted) {
-        axios
-          .delete(`${server}/event/delete-shop-event/${data._id}`)
-          .then(() => {
-            console.log("Event deleted successfully.");
-            setIsDeleted(true);
-          })
-          .catch((err) => {
-            console.error("Error deleting event:", err.response?.data || err.message);
-            setIsDeleted(true); // Prevent retry loop
-          });
-      }
-    }, 1000);
-
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, [data._id, isDeleted, calculateTimeLeft]);
+  }, [data?.Finish_Date, onTimeUpChange]);
 
-  const timerComponents = Object.entries(timeLeft)
-    .filter(([key, value]) => key !== "total" && value >= 0)
-    .map(([key, value]) => (
-      <span key={key} className="text-[25px] text-[#475ad2]">
-        {value} {key}{" "}
-      </span>
-    ));
+  if (timeLeft.total <= 0) {
+    return <span className="text-sm font-semibold text-[#b91c1c]">Offer ended</span>;
+  }
+
+  const units = [
+    { label: "Days", value: timeLeft.days },
+    { label: "Hours", value: timeLeft.hours },
+    { label: "Minutes", value: timeLeft.minutes },
+    { label: "Seconds", value: timeLeft.seconds },
+  ];
 
   return (
-    <div>
-      {timeLeft.total > 0 ? (
-        timerComponents
-      ) : (
-        <span className="text-red-500 text-[25px]">Time's Up</span>
-      )}
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {units.map((unit) => (
+        <div key={unit.label} className="surface-card-sm bg-white p-3 text-center">
+          <p className="text-lg font-bold text-[#1f2937]">{unit.value}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-[#6b7280]">{unit.label}</p>
+        </div>
+      ))}
     </div>
   );
 };

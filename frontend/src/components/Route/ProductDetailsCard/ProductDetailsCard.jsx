@@ -98,7 +98,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
         aria-modal="true"
       >
         {/* Top Accent */}
-        <div className="h-[4px] w-full bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600" />
+        <div
+          className="h-[4px] w-full"
+          style={{ background: "linear-gradient(90deg, #a67861, #885e4a)" }}
+        />
 
         {/* Sticky Header (clean) */}
         <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
@@ -147,7 +150,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                   <div className="min-w-0">
                     <p className="font-semibold text-gray-900 truncate">{data.shop?.name}</p>
                     <p className="text-xs text-gray-500">
-                      {data?.ratings || 0} ratings • <span className="text-[#3d569a] font-semibold">View shop</span>
+                      {data?.ratings || 0} ratings • <span className="text-[#885e4a] font-semibold">View shop</span>
                     </p>
                   </div>
                 </Link>
@@ -180,7 +183,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
               {/* Top chips */}
               <div className="flex items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-200">
-                  <span className="w-2 h-2 rounded-full bg-gradient-to-r from-pink-500 to-violet-600" />
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: "linear-gradient(90deg, #a67861, #885e4a)" }}
+                  />
                   <span className="text-xs font-semibold text-gray-700">{data.category}</span>
                 </div>
 
@@ -221,7 +227,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                     ) : null}
 
                     {discountPercent ? (
-                      <span className="text-xs font-bold text-white px-3 py-1 rounded-full bg-gradient-to-r from-pink-500 to-violet-600">
+                      <span className="text-xs font-bold text-white px-3 py-1 rounded-full bg-[#885e4a]">
                         {discountPercent}% OFF
                       </span>
                     ) : null}
@@ -263,7 +269,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                 <button
                   className="
                     w-full rounded-xl
-                    bg-[#1a2240] hover:bg-black
+                    bg-[#885e4a] hover:bg-[#a67861]
                     text-white font-semibold
                     py-3.5
                     flex items-center justify-center gap-2

@@ -54,11 +54,11 @@ const AllSellers = () => {
       renderCell: (params) => (
         <Link to={`/shop/preview/${params.id}`}>
           <button
-            className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition"
+            className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
             title="View shop details"
             type="button"
           >
-            <AiOutlineEye size={20} className="text-gray-900" />
+            <AiOutlineEye size={20} className="text-[var(--color-text)]" />
           </button>
         </Link>
       ),
@@ -76,11 +76,11 @@ const AllSellers = () => {
             setUserId(params.id)
             setOpen(true)
           }}
-          className="h-10 w-10 rounded-xl hover:bg-rose-50 flex items-center justify-center transition"
+          className="btn-danger !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
           title="Delete seller"
           type="button"
         >
-          <AiOutlineDelete size={20} className="text-rose-600" />
+          <AiOutlineDelete size={20} />
         </button>
       ),
     },
@@ -98,23 +98,21 @@ const AllSellers = () => {
   })
 
   return (
-    <div className="w-full flex justify-center pt-5">
-      <div className="w-[97%]">
-        <h3 className="text-[22px] font-Poppins pb-2 border-b border-gray-200 mb-4">
-          <span className="relative">
-            All Sellers
-            <span className="absolute bottom-[-8px] left-0 w-24 h-1 bg-black"></span>
-          </span>
-        </h3>
+    <div className="w-full p-4 md:p-6">
+      <div className="surface-card overflow-hidden">
+        <div className="px-5 py-4 md:px-6">
+          <h3 className="text-[22px] font-semibold text-[var(--color-text)]">All Sellers</h3>
+          <p className="mt-1 text-sm text-[var(--color-muted)]">Review registered shops across the marketplace.</p>
+        </div>
 
-        <div className="w-full min-h-[45vh] bg-white rounded shadow-md border border-gray-200 overflow-hidden">
+        <div className="px-2 md:px-4 pb-4">
+          <div className="surface-card-sm overflow-hidden bg-white">
           <DataGrid
             rows={rows}
             columns={columns}
             pageSize={10}
             disableSelectionOnClick
             autoHeight
-            className="bg-white"
             rowsPerPageOptions={[10, 20, 50]}
             sx={{
               border: 0,
@@ -136,33 +134,35 @@ const AllSellers = () => {
               },
             }}
           />
+          </div>
         </div>
+      </div>
 
         {open && (
           <div className="w-full fixed top-0 left-0 z-[999] bg-[#00000080] flex items-center justify-center h-screen transition-all duration-300">
-            <div className="w-[95%] 800px:w-[40%] min-h-[20vh] bg-white rounded-2xl shadow-2xl p-6">
+            <div className="surface-card w-[95%] 800px:w-[40%] min-h-[20vh] p-6">
               <div className="w-full flex justify-end">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition"
+                  className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
                   title="Close"
                 >
-                  <RxCross1 size={18} className="text-gray-700" />
+                  <RxCross1 size={18} className="text-[var(--color-text)]" />
                 </button>
               </div>
 
               <div className="flex flex-col items-center justify-center text-center">
-                <div className="h-14 w-14 rounded-2xl bg-rose-50 flex items-center justify-center">
-                  <BiErrorCircle size={26} className="text-rose-600" />
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#dcc0b4] bg-[#f3e2dc] text-[#8d4e3c]">
+                  <BiErrorCircle size={26} />
                 </div>
-                <h3 className="mt-4 text-xl font-semibold text-gray-900">Delete seller?</h3>
-                <p className="mt-2 text-sm text-gray-500">This action cannot be undone.</p>
+                <h3 className="mt-4 text-xl font-semibold text-[var(--color-text)]">Delete seller?</h3>
+                <p className="mt-2 text-sm text-[var(--color-muted)]">This action cannot be undone.</p>
               </div>
 
               <div className="w-full flex items-center justify-center gap-3 mt-6">
                 <button
-                  className="flex-1 h-11 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-semibold transition"
+                  className="btn-secondary !h-11 !w-full"
                   onClick={() => setOpen(false)}
                   type="button"
                 >
@@ -170,7 +170,7 @@ const AllSellers = () => {
                 </button>
 
                 <button
-                  className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold transition"
+                  className="btn-danger !h-11 !w-full"
                   onClick={() => {
                     setOpen(false)
                     handleDelete(userId)
@@ -183,7 +183,6 @@ const AllSellers = () => {
             </div>
           </div>
         )}
-      </div>
     </div>
   )
 }

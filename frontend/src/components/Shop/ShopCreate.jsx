@@ -1,25 +1,30 @@
-import React, { useState } from "react"
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
-import { Link } from "react-router-dom"
-import axios from "axios"
-import { server } from "../../server"
-import { toast } from "react-toastify"
-import { RxAvatar } from "react-icons/rx"
+import React, { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { RxAvatar } from "react-icons/rx";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { server } from "../../server";
 
 const ShopCreate = () => {
-  const [email, setEmail] = useState("")
-  const [name, setName] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [zipCode, setZipCode] = useState("")
-  const [address, setAddress] = useState("")
-  const [avatar, setAvatar] = useState("")
-  const [password, setPassword] = useState("")
-  const [visible, setVisible] = useState(false)
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [address, setAddress] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [password, setPassword] = useState("");
+  const [visible, setVisible] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!avatar) {
+      toast.error("Please upload a shop logo.");
+      return;
+    }
+
     try {
-      const { data } = await axios.post(`${server}/shop/create-shop`, {
+      const response = await axios.post(`${server}/shop/create-shop`, {
         name,
         email,
         password,
@@ -27,244 +32,133 @@ const ShopCreate = () => {
         zipCode,
         address,
         phoneNumber,
-      })
-      toast.success(data.message)
-      setName("")
-      setEmail("")
-      setPassword("")
-      setAvatar("")
-      setZipCode("")
-      setAddress("")
-      setPhoneNumber("")
+      });
+
+      toast.success(response?.data?.message || "Shop created.");
+      setName("");
+      setEmail("");
+      setPassword("");
+      setAvatar("");
+      setZipCode("");
+      setAddress("");
+      setPhoneNumber("");
+
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error occurred")
+      toast.error(error?.response?.data?.message || "Unable to create shop.");
     }
-  }
+  };
 
-  const handleFileInputChange = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleFileInputChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = () => {
-      if (reader.readyState === 2) setAvatar(reader.result)
-    }
-    reader.readAsDataURL(file)
-  }
+      if (reader.readyState === 2) setAvatar(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative px-4 py-10">
-      {/* Background (GlamCart Seller style) */}
-      <div className="absolute inset-0 bg-[#0b1020]" />
-      <div className="absolute inset-0 bg-[radial-gradient(900px_520px_at_18%_10%,rgba(61,86,154,0.22),transparent_60%),radial-gradient(900px_520px_at_85%_18%,rgba(139,92,246,0.22),transparent_60%),radial-gradient(700px_420px_at_50%_100%,rgba(236,72,153,0.14),transparent_60%)]" />
+    <div className="page-shell flex items-center justify-center px-4 py-12">
+      <div className="surface-card w-full max-w-[42rem] p-8">
+        <span className="eyebrow">Become a seller</span>
+        <h1 className="section-heading mt-5 text-[2rem]">Create your shop</h1>
+        <p className="section-copy mt-3">
+          Register your seller account. An admin must review and approve your shop before your first login.
+        </p>
 
-      {/* Card */}
-      <div className="relative w-full max-w-[38rem] rounded-3xl bg-white/10 backdrop-blur-xl border border-white/15 shadow-[0_25px_60px_-25px_rgba(0,0,0,0.9)] p-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20">
-            <span className="w-2 h-2 rounded-full bg-gradient-to-r from-violet-500 to-pink-500" />
-            <span className="text-xs text-white/80 font-semibold tracking-wide">Become a Seller</span>
+        <div className="surface-card-sm mt-8 flex items-center gap-4 bg-[#fbf8f3] p-4">
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-[#e6ddd2] bg-white">
+            {avatar ? (
+              <img src={avatar || "/placeholder.svg"} alt="Shop logo preview" className="h-full w-full object-cover" />
+            ) : (
+              <RxAvatar size={32} className="text-[#6b7280]" />
+            )}
           </div>
 
-          <h2 className="mt-4 text-3xl font-extrabold text-white">Create your shop</h2>
-          <p className="mt-2 text-sm text-white/70">
-            Start selling makeup, skincare, and beauty products on GlamCart
-          </p>
-        </div>
-
-        {/* Logo upload (new UI) */}
-        <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white/10 border border-white/15 flex items-center justify-center">
-                {avatar ? (
-                  <img src={avatar || "/placeholder.svg"} alt="logo" className="w-full h-full object-cover" />
-                ) : (
-                  <RxAvatar className="text-white/70" size={34} />
-                )}
-              </div>
-              <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 border border-white/20" />
-            </div>
-
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-white">Shop Logo</p>
-              <p className="text-xs text-white/60">Upload your brand identity (PNG/JPG)</p>
-
-              <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-white/10 border border-white/15 hover:bg-white/15 transition">
-                Upload Logo
-                <input
-                  type="file"
-                  name="avatar"
-                  accept="image/*"
-                  onChange={handleFileInputChange}
-                  className="hidden"
-                />
-              </label>
-            </div>
+          <div>
+            <p className="font-medium text-[#1f2937]">Shop logo</p>
+            <label className="mt-2 inline-flex cursor-pointer rounded-full border border-[#e6ddd2] bg-white px-4 py-2 text-sm font-medium text-[#1f2937]">
+              Upload logo
+              <input type="file" name="avatar" accept="image/*" onChange={handleFileInputChange} className="hidden" />
+            </label>
           </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Row 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Shop Name</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="
-                  w-full rounded-xl bg-white/10 border border-white/20
-                  px-4 py-3 text-white placeholder-white/50
-                  outline-none focus:ring-4 focus:ring-violet-500/30
-                  focus:border-violet-400/50 transition
-                "
-                placeholder="Your shop name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Phone Number</label>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Shop name">
+              <input value={name} onChange={(event) => setName(event.target.value)} className="field-input" required />
+            </Field>
+            <Field label="Phone number">
               <input
                 type="number"
-                required
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="
-                  w-full rounded-xl bg-white/10 border border-white/20
-                  px-4 py-3 text-white placeholder-white/50
-                  outline-none focus:ring-4 focus:ring-violet-500/30
-                  focus:border-violet-400/50 transition
-                "
-                placeholder="98XXXXXXXX"
-              />
-            </div>
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Email address</label>
-            <input
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="
-                w-full rounded-xl bg-white/10 border border-white/20
-                px-4 py-3 text-white placeholder-white/50
-                outline-none focus:ring-4 focus:ring-violet-500/30
-                focus:border-violet-400/50 transition
-              "
-              placeholder="shop@email.com"
-            />
-          </div>
-
-          {/* Address */}
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Address</label>
-            <input
-              type="text"
-              required
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="
-                w-full rounded-xl bg-white/10 border border-white/20
-                px-4 py-3 text-white placeholder-white/50
-                outline-none focus:ring-4 focus:ring-violet-500/30
-                focus:border-violet-400/50 transition
-              "
-              placeholder="Your shop address"
-            />
-          </div>
-
-          {/* Row 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Zip Code</label>
-              <input
-                type="number"
+                onChange={(event) => setPhoneNumber(event.target.value)}
+                className="field-input"
                 required
-                value={zipCode}
-                onChange={(e) => setZipCode(e.target.value)}
-                className="
-                  w-full rounded-xl bg-white/10 border border-white/20
-                  px-4 py-3 text-white placeholder-white/50
-                  outline-none focus:ring-4 focus:ring-violet-500/30
-                  focus:border-violet-400/50 transition
-                "
-                placeholder="Zip code"
               />
-            </div>
+            </Field>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Password</label>
+          <Field label="Email address">
+            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="field-input" required />
+          </Field>
+
+          <Field label="Address">
+            <input value={address} onChange={(event) => setAddress(event.target.value)} className="field-input" required />
+          </Field>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Zip code">
+              <input type="number" value={zipCode} onChange={(event) => setZipCode(event.target.value)} className="field-input" required />
+            </Field>
+            <Field label="Password">
               <div className="relative">
                 <input
                   type={visible ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="
-                    w-full rounded-xl bg-white/10 border border-white/20
-                    px-4 py-3 text-white placeholder-white/50
-                    outline-none focus:ring-4 focus:ring-violet-500/30
-                    focus:border-violet-400/50 transition
-                  "
-                  placeholder="Create password"
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="field-input pr-12"
+                  required
                 />
-                {visible ? (
-                  <AiOutlineEye
-                    size={22}
-                    className="absolute right-4 top-3.5 cursor-pointer text-white/70 hover:text-white"
-                    onClick={() => setVisible(false)}
-                  />
-                ) : (
-                  <AiOutlineEyeInvisible
-                    size={22}
-                    className="absolute right-4 top-3.5 cursor-pointer text-white/70 hover:text-white"
-                    onClick={() => setVisible(true)}
-                  />
-                )}
+                <button
+                  type="button"
+                  onClick={() => setVisible((value) => !value)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6b7280]"
+                >
+                  {visible ? <AiOutlineEye size={20} /> : <AiOutlineEyeInvisible size={20} />}
+                </button>
               </div>
-            </div>
+            </Field>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="
-              w-full rounded-xl py-3 font-bold text-white
-              bg-gradient-to-r from-violet-600 to-pink-500
-              hover:brightness-110 transition
-              shadow-[0_15px_35px_-15px_rgba(139,92,246,0.9)]
-            "
-          >
-            Create Shop ✨
+          <button type="submit" className="btn-primary !w-full">
+            Create shop
           </button>
-
-          {/* Footer */}
-          <div className="text-center text-sm text-white/70">
-            Already have a shop account?
-            <Link to="/shop-login" className="ml-1 text-pink-300 hover:text-pink-200 font-semibold">
-              Sign in
-            </Link>
-          </div>
         </form>
 
-        {/* Helper */}
-        <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-xs text-white/65">
-            Tip: Use a clean logo and complete your store details to build customer trust.
-          </p>
+        <div className="surface-card-sm mt-6 bg-[#f6f1e9] p-4 text-sm text-[#5b6470]">
+          After registration, your shop stays pending until an admin approves it. No email activation link is required.
         </div>
+
+        <p className="mt-6 text-center text-sm text-[#6b7280]">
+          Already have a seller account?
+          <Link to="/shop-login" className="ml-1 font-semibold text-[#1f2937]">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ShopCreate
+const Field = ({ label, children }) => (
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#1f2937]">{label}</label>
+    {children}
+  </div>
+);
+
+export default ShopCreate;

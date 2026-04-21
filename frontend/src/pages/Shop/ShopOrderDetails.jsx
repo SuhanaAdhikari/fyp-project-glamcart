@@ -1,16 +1,13 @@
-import React from 'react'
-import DashboardHeader from '../../components/Shop/Layout/DashboardHeader'
-import Footer from '../../components/Layout/Footer'
+import React from "react";
+import SellerWorkspace from "../../components/Shop/Layout/SellerWorkspace";
 import OrderDetails from "../../components/Shop/OrderDetails";
 
 const ShopOrderDetails = () => {
   return (
-    <div>
-         <DashboardHeader />
-         <OrderDetails />
-          <Footer />
-    </div>
-  )
-}
+    <SellerWorkspace active={2}>
+      <OrderDetails />
+    </SellerWorkspace>
+  );
+};
 
-export default ShopOrderDetails
+export default ShopOrderDetails;

@@ -97,12 +97,9 @@ const AllWithdraw = () => {
       flex: 0.7,
       renderCell: (params) => {
         const v = params.value
-        const cls =
-          v === "Succeed"
-            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-            : "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+        const cls = v === "Succeed" ? "status-chip status-chip--success" : "status-chip status-chip--neutral"
         return (
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center justify-center ${cls}`}>
+          <span className={cls}>
             {v}
           </span>
         )
@@ -183,22 +180,22 @@ const AllWithdraw = () => {
   }
 
   return (
-    <div className="w-full p-4 md:p-6">
+      <div className="w-full p-4 md:p-6">
       {/* GlamCart header */}
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm mb-5">
+      <div className="surface-card mb-5">
         <div className="px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-[22px] md:text-[26px] font-semibold text-gray-900">Withdraw Requests</h2>
-            <p className="text-sm text-gray-500 mt-1">Review and approve seller withdrawals.</p>
+            <h2 className="text-[22px] md:text-[26px] font-semibold text-[var(--color-text)]">Withdraw Requests</h2>
+            <p className="mt-1 text-sm text-[var(--color-muted)]">Review and approve seller withdrawals.</p>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+              <span className="status-chip status-chip--neutral">
                 Total: {summary.total}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+              <span className="status-chip status-chip--muted">
                 Processing: {summary.processing}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+              <span className="status-chip status-chip--success">
                 Succeed: {summary.succeed}
               </span>
             </div>
@@ -206,13 +203,13 @@ const AllWithdraw = () => {
 
           {/* Search */}
           <div className="w-full md:w-[420px]">
-            <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 h-12">
-              <FiSearch className="text-gray-500" />
+            <div className="flex items-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 h-12">
+              <FiSearch className="text-[var(--color-muted)]" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search by shop, id, status, amount..."
-                className="w-full outline-none bg-transparent text-sm text-gray-900 placeholder:text-gray-400"
+                className="w-full outline-none bg-transparent text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)]"
               />
             </div>
           </div>
@@ -220,27 +217,27 @@ const AllWithdraw = () => {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="surface-card overflow-hidden">
         <div className="px-5 py-4 md:px-6 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Request List</h3>
-            <p className="text-sm text-gray-500 mt-1">Showing {rows.length} request(s)</p>
+            <h3 className="text-lg font-semibold text-[var(--color-text)]">Request List</h3>
+            <p className="mt-1 text-sm text-[var(--color-muted)]">Showing {rows.length} request(s)</p>
           </div>
         </div>
 
         <div className="px-2 md:px-4 pb-4">
           {rows.length === 0 && !loading ? (
-            <div className="py-14 text-center">
-              <div className="mx-auto h-14 w-14 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-900">
+              <div className="py-14 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] text-[var(--color-accent-strong)]">
                 <FiCreditCard size={24} />
               </div>
-              <h4 className="mt-4 text-lg font-semibold text-gray-900">No withdraw requests</h4>
-              <p className="mt-2 text-sm text-gray-500">
+              <h4 className="mt-4 text-lg font-semibold text-[var(--color-text)]">No withdraw requests</h4>
+              <p className="mt-2 text-sm text-[var(--color-muted)]">
                 {q ? `No requests matching "${q}".` : "No withdrawal requests have been made yet."}
               </p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="surface-card-sm overflow-hidden bg-white">
               <DataGrid
                 rows={rows}
                 columns={columns}
@@ -259,7 +256,7 @@ const AllWithdraw = () => {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-2xl p-6">
+          <div className="surface-card w-full max-w-md p-6">
             <div className="w-full flex justify-end">
               <button
                 type="button"
@@ -267,34 +264,34 @@ const AllWithdraw = () => {
                   setOpen(false)
                   setWithdrawData(null)
                 }}
-                className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition"
+                className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
                 title="Close"
               >
-                <RxCross1 size={18} className="text-gray-700" />
+                <RxCross1 size={18} className="text-[var(--color-text)]" />
               </button>
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <div className="h-14 w-14 rounded-2xl bg-amber-50 flex items-center justify-center">
-                <FiAlertTriangle size={24} className="text-amber-700" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]">
+                <FiAlertTriangle size={24} />
               </div>
-              <h3 className="mt-4 text-xl font-semibold text-gray-900">Update withdrawal</h3>
-              <p className="mt-2 text-sm text-gray-500">Confirm the status update for this request.</p>
+              <h3 className="mt-4 text-xl font-semibold text-[var(--color-text)]">Update withdrawal</h3>
+              <p className="mt-2 text-sm text-[var(--color-muted)]">Confirm the status update for this request.</p>
             </div>
 
             <div className="mt-6 space-y-4">
-              <div className="rounded-xl border border-gray-200 p-4">
-                <div className="text-xs font-semibold text-gray-500">Withdrawal Amount</div>
-                <div className="text-lg font-bold text-gray-900 mt-1">Rs. {withdrawData?.amount}</div>
-                <div className="text-xs text-gray-500 mt-1">Withdraw ID: {withdrawData?.id}</div>
+              <div className="surface-card-sm p-4">
+                <div className="text-xs font-semibold text-[var(--color-muted)]">Withdrawal Amount</div>
+                <div className="mt-1 text-lg font-bold text-[var(--color-text)]">Rs. {withdrawData?.amount}</div>
+                <div className="mt-1 text-xs text-[var(--color-muted)]">Withdraw ID: {withdrawData?.id}</div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                <label className="mb-2 block text-sm font-semibold text-[var(--color-text)]">Status</label>
                 <select
                   value={withdrawStatus}
                   onChange={(e) => setWithdrawStatus(e.target.value)}
-                  className="w-full h-11 px-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
+                  className="field-select !min-h-[44px]"
                 >
                   <option value="Processing">Processing</option>
                   <option value="Succeed">Succeed</option>
@@ -309,14 +306,14 @@ const AllWithdraw = () => {
                   setOpen(false)
                   setWithdrawData(null)
                 }}
-                className="flex-1 h-11 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-semibold transition"
+                className="btn-secondary !h-11 !w-full"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="flex-1 h-11 rounded-xl bg-black hover:opacity-90 text-white text-sm font-semibold transition"
+                className="btn-primary !h-11 !w-full"
               >
                 Update Status
               </button>

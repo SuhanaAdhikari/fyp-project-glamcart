@@ -1,22 +1,13 @@
-import React from 'react'
-import AdminHeader from '../components/Layout/AdminHeader'
-import AdminSideBar from '../components/Admin/Layout/AdminSideBar'
+import React from "react";
+import AdminWorkspace from "../components/Admin/Layout/AdminWorkspace";
 import AllUsers from "../components/Admin/AllUsers";
 
 const AdminDashboardUsers = () => {
   return (
-    <div>
-    <AdminHeader />
-    <div className="w-full flex">
-      <div className="flex items-start justify-between w-full">
-        <div className="w-[80px] 800px:w-[330px]">
-          <AdminSideBar active={4} />
-        </div>
-        <AllUsers />
-      </div>
-    </div>
-  </div>
-  )
-}
+    <AdminWorkspace active={4}>
+      <AllUsers />
+    </AdminWorkspace>
+  );
+};
 
-export default AdminDashboardUsers
+export default AdminDashboardUsers;

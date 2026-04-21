@@ -252,8 +252,8 @@ const DashboardMessages = () => {
           width: 10px;
           height: 10px;
           border-radius: 999px;
-          background: linear-gradient(90deg, #ec4899, #a855f7);
-          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+          box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.12);
           display: inline-block;
         }
 
@@ -267,7 +267,7 @@ const DashboardMessages = () => {
         .gc_cardTopLine {
           height: 5px;
           width: 100%;
-          background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
         }
 
         .gc_searchWrap {
@@ -289,8 +289,8 @@ const DashboardMessages = () => {
           transition: 160ms ease;
         }
         .gc_searchInput:focus {
-          border-color: rgba(168, 85, 247, 0.65);
-          box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
+          border-color: var(--color-accent);
+          box-shadow: 0 0 0 4px rgba(166, 120, 97, 0.15);
         }
 
         .gc_iconCircle {
@@ -300,8 +300,8 @@ const DashboardMessages = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: rgba(236, 72, 153, 0.12);
-          border: 1px solid rgba(236, 72, 153, 0.22);
+          background: var(--color-surface-soft);
+          border: 1px solid var(--color-border);
           color: #111827;
           font-size: 22px;
         }
@@ -319,7 +319,7 @@ const DashboardMessages = () => {
           background: rgba(17, 24, 39, 0.03);
         }
         .gc_rowActive {
-          background: linear-gradient(90deg, rgba(236, 72, 153, 0.06), rgba(168, 85, 247, 0.06));
+          background: var(--color-surface-soft);
         }
 
         .gc_avatar {
@@ -361,16 +361,16 @@ const DashboardMessages = () => {
         }
 
         .gc_chatBody {
-          background: linear-gradient(180deg, rgba(236, 72, 153, 0.04), rgba(168, 85, 247, 0.02));
+          background: var(--color-surface-soft);
         }
 
         .gc_bubbleMe {
-          background: linear-gradient(90deg, #ec4899, #a855f7);
+          background: var(--color-accent-strong);
           color: #fff;
           border-radius: 16px;
           border-top-right-radius: 6px;
           padding: 10px 12px;
-          box-shadow: 0 10px 18px rgba(168, 85, 247, 0.14);
+          box-shadow: 0 10px 18px rgba(136, 94, 74, 0.14);
         }
         .gc_bubbleYou {
           background: #fff;
@@ -402,8 +402,8 @@ const DashboardMessages = () => {
           transition: 160ms ease;
         }
         .gc_textInput:focus {
-          border-color: rgba(236, 72, 153, 0.65);
-          box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.12);
+          border-color: var(--color-accent);
+          box-shadow: 0 0 0 4px rgba(166, 120, 97, 0.12);
         }
         .gc_sendBtn {
           position: absolute;
@@ -414,7 +414,7 @@ const DashboardMessages = () => {
           height: 36px;
           border-radius: 999px;
           border: none;
-          background: linear-gradient(90deg, #ec4899, #a855f7);
+          background: var(--color-accent-strong);
           color: #fff;
           display: inline-flex;
           align-items: center;

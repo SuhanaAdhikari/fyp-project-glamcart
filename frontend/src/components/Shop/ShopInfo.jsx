@@ -75,7 +75,7 @@ const GlamCartNavbar = () => {
         }
         .gc_navTop {
           height: 6px;
-          background: linear-gradient(90deg, #1a2240, #3d569a, #4b6cb7);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
         }
         .gc_navInner {
           max-width: 1200px;
@@ -97,8 +97,8 @@ const GlamCartNavbar = () => {
           width: 12px;
           height: 12px;
           border-radius: 999px;
-          background: linear-gradient(90deg, #1a2240, #3d569a);
-          box-shadow: 0 0 0 3px rgba(61, 86, 154, 0.14);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+          box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.14);
         }
         .gc_brandText {
           font-size: 18px;
@@ -130,8 +130,8 @@ const GlamCartNavbar = () => {
           outline: none;
         }
         .gc_searchInput:focus {
-          border-color: rgba(61, 86, 154, 0.6);
-          box-shadow: 0 0 0 4px rgba(61, 86, 154, 0.12);
+          border-color: rgba(166, 120, 97, 0.6);
+          box-shadow: 0 0 0 4px rgba(166, 120, 97, 0.12);
         }
 
         .gc_links {
@@ -166,7 +166,7 @@ const GlamCartNavbar = () => {
           text-decoration: none;
           font-weight: 900;
           color: #fff;
-          background: linear-gradient(90deg, #1a2240, #3d569a, #4b6cb7);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
           border: 1px solid rgba(255, 255, 255, 0.18);
           box-shadow: 0 14px 26px rgba(17, 24, 39, 0.12);
           transition: 160ms ease;
@@ -241,9 +241,12 @@ const ShopInfo = ({ isOwner }) => {
         <Loader />
       ) : (
         <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-          <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all hover:shadow-lg border border-[#dce5f3]">
+          <div className="surface-card overflow-hidden transition-all hover:shadow-lg">
             {/* Cover */}
-            <div className="relative h-48 bg-gradient-to-r from-[#1a2240] to-[#3d569a] overflow-hidden">
+            <div
+              className="relative h-48 overflow-hidden"
+              style={{ background: "linear-gradient(90deg, var(--color-accent), var(--color-accent-strong))" }}
+            >
               {data?.coverImage && (
                 <img
                   src={data.coverImage.url || "/placeholder.svg"}
@@ -251,7 +254,10 @@ const ShopInfo = ({ isOwner }) => {
                   className="w-full h-full object-cover opacity-30"
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1a2240] to-transparent"></div>
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(180deg, rgba(136, 94, 74, 0.88), transparent)" }}
+              />
             </div>
 
             {/* Profile */}
@@ -267,93 +273,93 @@ const ShopInfo = ({ isOwner }) => {
                   </div>
 
                   {isVerified && (
-                    <div className="absolute bottom-4 right-0 bg-blue-500 rounded-full p-1 border-2 border-white">
+                    <div className="absolute bottom-4 right-0 bg-[var(--color-accent-strong)] rounded-full p-1 border-2 border-white">
                       <FiCheck className="text-white text-sm" />
                     </div>
                   )}
                 </div>
 
-                <h1 className="text-2xl font-bold mb-2 text-[#1a2240]">{data?.name}</h1>
+                <h1 className="text-2xl font-bold mb-2 text-[var(--color-text)]">{data?.name}</h1>
 
-                <div className="flex items-center gap-2 bg-[#f0f4fa] px-3 py-1 rounded-full mb-4">
+                <div className="flex items-center gap-2 bg-[var(--color-surface-soft)] px-3 py-1 rounded-full mb-4 border border-[var(--color-border)]">
                   <FiStar className="text-yellow-500" />
-                  <span className="font-medium text-[#1a2240]">{averageRating.toFixed(1)}/5</span>
-                  <span className="text-sm text-[#334580]">({totalReviewsLength} reviews)</span>
+                  <span className="font-medium text-[var(--color-text)]">{averageRating.toFixed(1)}/5</span>
+                  <span className="text-sm text-[var(--color-muted)]">({totalReviewsLength} reviews)</span>
                 </div>
               </div>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-2 px-6 mb-6">
-              <div className="bg-gradient-to-r from-[#1a2240] to-[#3d569a] rounded-lg p-3 text-white flex items-center">
+              <div className="rounded-lg p-3 text-white flex items-center bg-[var(--color-accent-strong)]">
                 <div className="p-2 bg-white/20 rounded-full mr-3">
                   <FiShoppingBag />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-blue-100">Products</p>
+                  <p className="text-xs font-medium text-white/75">Products</p>
                   <p className="text-xl font-bold">{products?.length || 0}</p>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-[#3d569a] to-[#4b6cb7] rounded-lg p-3 text-white flex items-center">
+              <div className="rounded-lg p-3 text-white flex items-center bg-[var(--color-accent)]">
                 <div className="p-2 bg-white/20 rounded-full mr-3">
                   <FiTrendingUp />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-blue-100">Sales</p>
+                  <p className="text-xs font-medium text-white/75">Sales</p>
                   <p className="text-xl font-bold">{totalSales || 0}</p>
                 </div>
               </div>
             </div>
 
             {/* About */}
-            <div className="px-6 py-4 border-t border-[#dce5f3]">
-              <h2 className="text-lg font-semibold text-[#1a2240] mb-2">About the Shop</h2>
-              <p className="text-[#334580] leading-relaxed">
+            <div className="px-6 py-4 border-t border-[var(--color-border)]">
+              <h2 className="text-lg font-semibold text-[var(--color-text)] mb-2">About the Shop</h2>
+              <p className="text-[var(--color-muted)] leading-relaxed">
                 {data?.description || "This shop has not added a description yet."}
               </p>
             </div>
 
             {/* Details */}
-            <div className="px-6 py-4 bg-[#f8fafd]">
+            <div className="px-6 py-4 bg-[var(--color-surface-soft)]">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#f0f4fa] rounded-full">
-                    <FiMapPin className="text-[#3d569a]" />
+                  <div className="p-2 bg-[var(--color-surface)] rounded-full border border-[var(--color-border)]">
+                    <FiMapPin className="text-[var(--color-accent-strong)]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1a2240]">Address</h3>
-                    <p className="text-[#334580]">{data?.address || "No address provided"}</p>
+                    <h3 className="font-semibold text-[var(--color-text)]">Address</h3>
+                    <p className="text-[var(--color-muted)]">{data?.address || "No address provided"}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#f0f4fa] rounded-full">
-                    <FiPhone className="text-[#3d569a]" />
+                  <div className="p-2 bg-[var(--color-surface)] rounded-full border border-[var(--color-border)]">
+                    <FiPhone className="text-[var(--color-accent-strong)]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1a2240]">Phone Number</h3>
-                    <p className="text-[#334580]">{data?.phoneNumber || "No phone provided"}</p>
+                    <h3 className="font-semibold text-[var(--color-text)]">Phone Number</h3>
+                    <p className="text-[var(--color-muted)]">{data?.phoneNumber || "No phone provided"}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#f0f4fa] rounded-full">
-                    <FiShoppingBag className="text-[#3d569a]" />
+                  <div className="p-2 bg-[var(--color-surface)] rounded-full border border-[var(--color-border)]">
+                    <FiShoppingBag className="text-[var(--color-accent-strong)]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1a2240]">Total Products</h3>
-                    <p className="text-[#334580]">{products?.length || 0}</p>
+                    <h3 className="font-semibold text-[var(--color-text)]">Total Products</h3>
+                    <p className="text-[var(--color-muted)]">{products?.length || 0}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-[#f0f4fa] rounded-full">
-                    <FiCalendar className="text-[#3d569a]" />
+                  <div className="p-2 bg-[var(--color-surface)] rounded-full border border-[var(--color-border)]">
+                    <FiCalendar className="text-[var(--color-accent-strong)]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1a2240]">Joined On</h3>
-                    <p className="text-[#334580]">
+                    <h3 className="font-semibold text-[var(--color-text)]">Joined On</h3>
+                    <p className="text-[var(--color-muted)]">
                       {data?.createdAt
                         ? new Date(data.createdAt).toLocaleDateString("en-US", {
                             year: "numeric",
@@ -369,17 +375,17 @@ const ShopInfo = ({ isOwner }) => {
 
             {/* Owner actions */}
             {isOwner && (
-              <div className="px-6 py-4 bg-[#f8fafd] border-t border-[#dce5f3]">
+              <div className="px-6 py-4 bg-[var(--color-surface-soft)] border-t border-[var(--color-border)]">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link to="/settings" className="flex-1">
-                    <button className="w-full bg-gradient-to-r from-[#1a2240] to-[#3d569a] text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <button className="w-full bg-[var(--color-accent-strong)] hover:bg-[var(--color-accent)] text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                       <FiEdit className="text-lg" />
                       <span>Edit Shop</span>
                     </button>
                   </Link>
 
                   <button
-                    className="flex-1 border-2 border-[#3d569a] text-[#3d569a] hover:bg-[#f0f4fa] font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5"
+                    className="flex-1 border-2 border-[var(--color-accent)] text-[var(--color-accent-strong)] hover:bg-[var(--color-surface)] font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5"
                     onClick={logoutHandler}
                   >
                     <FiLogOut className="text-lg" />

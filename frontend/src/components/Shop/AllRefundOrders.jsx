@@ -119,7 +119,10 @@ const AllRefundOrders = () => {
 
             {/* Table */}
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-              <div className="h-[5px] w-full bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600" />
+              <div
+                className="h-[5px] w-full"
+                style={{ background: "linear-gradient(90deg, var(--color-accent), var(--color-accent-strong))" }}
+              />
               <div className="p-2 md:p-4">
                 <DataGrid
                   rows={row}
@@ -150,8 +153,8 @@ const AllRefundOrders = () => {
               width: 10px;
               height: 10px;
               border-radius: 999px;
-              background: linear-gradient(90deg, #ec4899, #a855f7);
-              box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+              background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+              box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.12);
               display: inline-block;
             }
 

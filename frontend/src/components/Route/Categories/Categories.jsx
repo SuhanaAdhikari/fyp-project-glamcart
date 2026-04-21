@@ -1,131 +1,89 @@
-import React, { cloneElement } from "react"
-import styles from "../../../styles/styles"
-import { brandingData, shoeCategoriesData } from "../../../static/data"
-import { useNavigate } from "react-router-dom"
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { brandingData, shoeCategoriesData } from "../../../static/data";
 
 const Categories = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const categories = shoeCategoriesData.slice(0, 10);
 
   const handleSubmit = (item) => {
-    // ✅ keep UX smooth (no full reload)
-    navigate(`/products?category=${encodeURIComponent(item.title)}`)
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+    navigate(`/products?category=${encodeURIComponent(item.title)}`);
+    window.scrollTo(0, 0);
+  };
 
   return (
-    <>
-      {/* ================= Branding Section ================= */}
-      <div className={`${styles.normalFlex} hidden sm:block px-6 md:px-16`}>
-        <div className="my-12 w-full rounded-2xl bg-white/80 backdrop-blur-md border border-gray-200 shadow-sm px-8 md:px-16 py-10 flex justify-between items-center gap-8">
-          {brandingData &&
-            brandingData.map((item, index) => (
-              <div key={index} className="flex items-start gap-4 max-w-xs">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 flex items-center justify-center shadow-sm">
-                  <span className="text-white text-[22px]">
-                    {cloneElement(item.icon, {
-                      strokeWidth: 2,
-                      strokeLinecap: "round",
-                    })}
-                  </span>
-                </div>
+    <section className="section-shell py-14" id="Categories">
+      <div className="section-frame">
+        <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+          <div className="surface-card accent-panel p-6 md:p-8">
+            <span className="eyebrow !bg-white">Categories</span>
+            <h2 className="section-heading mt-4 max-w-xl">Start with a category that matches your routine.</h2>
+            <p className="section-copy mt-4 max-w-2xl">
+              The storefront is cleaner now, but it should still feel rich. These category cards use more of the screen and make discovery faster.
+            </p>
 
-                <div>
-                  <h3 className="font-bold text-[16px] md:text-[18px] text-gray-900">{item.title}</h3>
-                  <p className="text-sm md:text-[15px] text-gray-600 leading-relaxed">{item.Description}</p>
-                </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <div className="floating-card px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#885e4a]">Categories</p>
+                <p className="mt-1 text-xl font-extrabold text-[#17212b]">{categories.length}</p>
               </div>
-            ))}
-        </div>
-      </div>
-
-      {/* ================= Categories Section ================= */}
-      <div className={`${styles.section} px-6 md:px-16 pb-12`} id="Categories">
-        {/* Badge title */}
-        <div className="mb-10 text-center">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/80 border border-gray-200 shadow-sm">
-            <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-pink-500 to-violet-600" />
-            <span className="text-sm font-semibold text-gray-800 tracking-wide">Categories</span>
+              <div className="floating-card px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#885e4a]">Experience</p>
+                <p className="mt-1 text-sm font-semibold text-[#17212b]">Cleaner browsing</p>
+              </div>
+            </div>
           </div>
 
-          <h2 className="mt-4 text-3xl md:text-4xl font-extrabold text-gray-900">Shop by Category</h2>
-          <p className="mt-2 text-sm md:text-base text-gray-600">Explore popular picks in one click</p>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {shoeCategoriesData &&
-            shoeCategoriesData.slice(0, 10).map((i) => (
-              <button
-                key={i.id}
-                type="button"
-                onClick={() => handleSubmit(i)}
-                className="
-                  group text-left
-                  rounded-2xl
-                  bg-white
-                  border border-gray-200
-                  shadow-sm
-                  px-6 py-7
-                  flex flex-col items-center gap-4
-                  transition-all duration-200
-                  hover:border-gray-300 hover:shadow-md
-                  focus:outline-none focus:ring-4 focus:ring-fuchsia-200
-                "
-                aria-label={`Go to ${i.title}`}
-              >
-                {/* ✅ Bigger image + better UI/UX */}
-                <div
-                  className="
-                    w-[92px] h-[92px] md:w-[100px] md:h-[100px]
-                    rounded-2xl
-                    bg-gradient-to-br from-gray-50 to-white
-                    border border-gray-200
-                    flex items-center justify-center
-                    overflow-hidden
-                    shadow-[0_10px_25px_rgba(17,24,39,0.06)]
-                  "
-                >
-                  <img
-                    src={i.image_Url || "/placeholder.svg"}
-                    alt={i.title}
-                    className="w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-200"
-                    loading="lazy"
-                  />
+          <div className="grid gap-4 md:grid-cols-2">
+            {brandingData.map((item, index) => (
+              <div key={item.id || index} className="surface-card-sm p-5">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#efe2d8] text-sm font-bold text-[#9b6b53]">
+                  {String(index + 1).padStart(2, "0")}
                 </div>
-
-                {/* Title + subtitle (if exists) */}
-                <div className="text-center">
-                  <h5 className="text-[15px] font-extrabold text-gray-900">{i.title}</h5>
-                  {i.subTitle ? (
-                    <p className="mt-1 text-[12px] font-semibold text-gray-500">{i.subTitle}</p>
-                  ) : null}
-                </div>
-
-                {/* Underline hover effect */}
-                <div className="relative h-[3px] w-12 overflow-hidden">
-                  <span
-                    className="
-                      absolute left-1/2 top-0
-                      h-[3px] w-0
-                      bg-gradient-to-r from-pink-500 to-violet-600
-                      rounded-full
-                      transition-all duration-300 ease-out
-                      group-hover:w-full
-                      group-hover:left-0
-                    "
-                  />
-                </div>
-              </button>
+                <h3 className="mt-4 text-lg font-semibold text-[#1f2937]">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-[#6b7280]">{item.Description}</p>
+              </div>
             ))}
+          </div>
         </div>
 
-        {/* Small note (optional): true background removal needs PNG/SVG */}
-        <p className="mt-6 text-center text-xs text-gray-500">
-          Tip: Real “background removed” images need transparent PNG/SVG. JPG photos can only be styled (cropped/contained).
-        </p>
-      </div>
-    </>
-  )
-}
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {categories.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleSubmit(item)}
+              className="group surface-card overflow-hidden text-left transition duration-200 hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(23,33,43,0.14)]"
+            >
+              <div className="relative h-56 overflow-hidden bg-[#fbf8f3]">
+                <img
+                  src={item.image_Url || "/placeholder.svg"}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+                />
+                <div className="absolute inset-x-0 bottom-0 p-4">
+                  <div className="floating-card flex items-center justify-between px-4 py-3">
+                    <span className="text-sm font-semibold text-[#17212b]">{item.subTitle}</span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#885e4a]">Browse</span>
+                  </div>
+                </div>
+              </div>
 
-export default Categories
+              <div className="p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-semibold text-[#1f2937]">{item.title}</h3>
+                  <span className="muted-chip !bg-[#f6efe7] !text-[#885e4a]">{String(item.id).padStart(2, "0")}</span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-[#6b7280]">
+                  Explore curated picks for {item.subTitle.toLowerCase()} in a wider product view.
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Categories;

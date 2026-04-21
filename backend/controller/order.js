@@ -6,16 +6,8 @@ const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
 const Order = require("../model/order");
 const Shop = require("../model/shop");
 const Product = require("../model/product");
-const axios = require("axios");
-
-
-const KHALTI_CONFIG = {
-  BASE_URL: "https://dev.khalti.com/api/v2/epayment",
-  SECRET_KEY: process.env.KHALTI_SECRET_KEY || "1867144249c744d3ba060c7de1348c98",
-  WEBSITE_URL: "http://localhost:3000", 
-  TIMEOUT: 15000,
-  MAX_RETRIES: 3,
-};
+const { initiateKhaltiPayment, lookupKhaltiPayment } = require("../utils/khalti");
+const KHALTI_CONFIG = require("../config/khaltiConfig");
 
 // create new order
 router.post(
@@ -229,11 +221,18 @@ router.put(
 router.post(
   "/create-order-khalti",
   catchAsyncErrors(async (req, res, next) => {
+    let orders = [];
+
     try {
       const { cart, shippingAddress, user, totalPrice, customerInfo } = req.body;
 
       if (!cart || !shippingAddress || !user || !totalPrice) {
         return next(new ErrorHandler("Missing required order information", 400));
+      }
+
+      const totalPriceNumber = Number(totalPrice);
+      if (!Number.isFinite(totalPriceNumber) || totalPriceNumber <= 0) {
+        return next(new ErrorHandler("Invalid totalPrice for Khalti payment", 400));
       }
 
       // Group cart items by shopId
@@ -247,13 +246,12 @@ router.post(
       }
 
       // Create orders but don't mark as paid yet
-      const orders = [];
       for (const [shopId, items] of shopItemsMap) {
         const order = await Order.create({
           cart: items,
           shippingAddress,
           user,
-          totalPrice,
+          totalPrice: totalPriceNumber,
           paymentInfo: {
             type: "Khalti",
             status: "Pending"
@@ -266,25 +264,30 @@ router.post(
       // Generate unique order identifier for Khalti
       const orderIds = orders.map(order => order._id.toString()).join(',');
       const productName = `Order from ShoeSphere - ${orders.length} item(s)`;
+      const purchaseOrderId = `khalti-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       
       // Convert amount to paisa (Khalti uses paisa)
-      const amountInPaisa = Math.round(totalPrice * 100);
+      const amountInPaisa = Math.max(Math.round(totalPriceNumber * 100), 1000);
 
-      // Initiate Khalti payment
-         const khaltiPayload = {
-        return_url: `http://localhost:3000/payment/khalti/verify?orderIds=${orderIds}`,
-        website_url: "http://localhost:3000",
+      const customerInfoPayload = {};
+      if (customerInfo?.name || user?.name) {
+        customerInfoPayload.name = customerInfo?.name || user?.name;
+      }
+      if (customerInfo?.email || user?.email) {
+        customerInfoPayload.email = customerInfo?.email || user?.email;
+      }
+      if (customerInfo?.phone || user?.phoneNumber) {
+        customerInfoPayload.phone = String(customerInfo?.phone || user?.phoneNumber);
+      }
+
+      const khaltiResponse = await initiateKhaltiPayment({
         amount: amountInPaisa,
-        purchase_order_id: orderIds,
-        purchase_order_name: productName,
-        customer_info: customerInfo || {
-          name: user.name,
-          email: user.email,
-          phone: user.phoneNumber
-        }
-      };
-
-      const khaltiResponse = await makeKhaltiApiCall("initiate/", khaltiPayload);
+        purchaseOrderId,
+        purchaseOrderName: productName,
+        returnUrl: `${KHALTI_CONFIG.FRONTEND_URL}/payment/khalti/verify?orderIds=${encodeURIComponent(orderIds)}`,
+        websiteUrl: KHALTI_CONFIG.FRONTEND_URL,
+        customerInfo: customerInfoPayload,
+      });
 
       // Update orders with Khalti payment info
       await Order.updateMany(
@@ -292,7 +295,8 @@ router.post(
         { 
           $set: { 
             'paymentInfo.pidx': khaltiResponse.pidx,
-            'paymentInfo.payment_url': khaltiResponse.payment_url
+            'paymentInfo.payment_url': khaltiResponse.payment_url,
+            'paymentInfo.purchaseOrderId': purchaseOrderId,
           }
         }
       );
@@ -309,41 +313,20 @@ router.post(
       });
 
     } catch (error) {
- console.error("Khalti order creation error:", error, error?.response?.data);
-return next(new ErrorHandler(
-  error?.response?.data?.detail || error?.message || "Failed to create order with Khalti payment", 
-  500
-));
+      console.error("Khalti order creation error:", error.response?.data || error.message || error);
+      if (orders.length) {
+        await Order.deleteMany({ _id: { $in: orders.map((o) => o._id) } });
+      }
+      return next(
+        new ErrorHandler(
+          error?.response?.data?.detail || error?.message || "Failed to create order with Khalti payment",
+          500
+        )
+      );
     }
   })
 );
 
-
-const makeKhaltiApiCall = async (endpoint, data, retries = KHALTI_CONFIG.MAX_RETRIES) => {
-  const url = `${KHALTI_CONFIG.BASE_URL}/${endpoint}`;
-  let attempt = 1;
-  
-  while (attempt <= retries) {
-    try {
-      console.log(`Khalti API attempt server ma request hanecha hai  ${attempt}: ${url}`, data , );
-      const response = await axios.post(url, data, {
-        headers: {
-          Authorization: `Key ${KHALTI_CONFIG.SECRET_KEY}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        timeout: KHALTI_CONFIG.TIMEOUT,
-      });
-      return response.data;
-    } catch (error) {
-      console.error(`Khalti API attempt ${attempt} failed:`, error.response?.data || error.message);
-      attempt++;
-      if (attempt > retries) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 500 * attempt)); 
-    }
-  }
-  throw new Error("Khalti API failed after retries");
-};
 
 router.post(
   "/khalti/initiate",
@@ -365,16 +348,17 @@ router.post(
    
       const amountInPaisa = Math.round(amount * 100);
 
-      const payload = {
-    return_url: `${KHALTI_CONFIG.WEBSITE_URL}/payment/khalti/verify`,
-        website_url: KHALTI_CONFIG.WEBSITE_URL,
+      const response = await initiateKhaltiPayment({
         amount: amountInPaisa,
-        purchase_order_id: productIdentity,
-        purchase_order_name: productName,
-        customer_info: customerInfo || {}
-      };
-
-      const response = await makeKhaltiApiCall("initiate/", payload);
+        purchaseOrderId: productIdentity,
+        purchaseOrderName: productName,
+        returnUrl: `${KHALTI_CONFIG.FRONTEND_URL}/payment/khalti/verify`,
+        websiteUrl: KHALTI_CONFIG.FRONTEND_URL,
+        customerInfo: {
+          ...customerInfo,
+          phone: String(customerInfo?.phone || ""),
+        },
+      });
 
       res.status(200).json({
         success: true,
@@ -395,68 +379,12 @@ router.post(
 );
 
 
-router.post(
-  "payment/khalti/verify",
-  catchAsyncErrors(async (req, res, next) => {
-    try {
-      const { pidx, orderId } = req.body;
-
-      if (!pidx) {
-        return next(new ErrorHandler("Missing pidx parameter", 400));
-      }
-
-      // Lookup payment status from Khalti
-      const verificationResponse = await makeKhaltiApiCall("lookup/", { pidx });
-
-      if (verificationResponse.status === "Completed") {
-        // Payment successful
-        const paymentInfo = {
-          id: verificationResponse.transaction_id,
-          status: "Completed",
-          type: "Khalti",
-          pidx: pidx,
-          amount: verificationResponse.total_amount,
-          fee: verificationResponse.fee
-        };
-
-        res.status(200).json({
-          success: true,
-          message: "Payment verified successfully",
-          paymentInfo: paymentInfo,
-          transactionDetails: verificationResponse
-        });
-
-      } else if (verificationResponse.status === "Pending") {
-        res.status(202).json({
-          success: false,
-          message: "Payment is still pending",
-          status: verificationResponse.status
-        });
-
-      } else {
-        res.status(400).json({
-          success: false,
-          message: "Payment verification failed",
-          status: verificationResponse.status,
-          details: verificationResponse
-        });
-      }
-
-    } catch (error) {
-      console.error("Khalti verification error:", error);
-      return next(new ErrorHandler(
-        error.response?.data?.detail || "Failed to verify Khalti payment", 
-        500
-      ));
-    }
-  })
-);
 
 
 
 // Verify Khalti payment and update order
 router.post(
-  "/verify-khalti-payment",
+  ["/verify-khalti-payment", "/khalti/verify"],
   catchAsyncErrors(async (req, res, next) => {
     try {
       const { pidx, orderIds } = req.body;
@@ -466,41 +394,57 @@ router.post(
       }
 
       // Verify payment with Khalti
-      const verificationResponse = await makeKhaltiApiCall("lookup/", { pidx });
+      const verificationResponse = await lookupKhaltiPayment(pidx);
+      const orderIdArray = orderIds.split(',');
+      const status = verificationResponse.status;
 
-      if (verificationResponse.status === "Completed") {
-        // Payment successful - update orders
-        const orderIdArray = orderIds.split(',');
-        
-        const updateResult = await Order.updateMany(
-          { _id: { $in: orderIdArray } },
-          {
-            $set: {
-              'paymentInfo.id': verificationResponse.transaction_id,
-              'paymentInfo.status': 'Completed',
-              'paymentInfo.khalti_fee': verificationResponse.fee,
-              status: 'Processing',
-              paidAt: new Date()
-            }
-          }
-        );
+      let paymentInfoStatus = status;
+      let orderStatus = 'Payment Pending';
+      let isCompleted = false;
 
-        const updatedOrders = await Order.find({ _id: { $in: orderIdArray } });
-
-        res.status(200).json({
-          success: true,
-          message: "Payment verified and orders updated successfully",
-          orders: updatedOrders,
-          transactionDetails: verificationResponse
-        });
-
+      if (status === 'Completed') {
+        paymentInfoStatus = 'Succeeded';
+        orderStatus = 'Processing';
+        isCompleted = true;
+      } else if (status === 'Failed') {
+        paymentInfoStatus = 'Failed';
+        orderStatus = 'Payment Failed';
+      } else if (status === 'Expired') {
+        paymentInfoStatus = 'Expired';
+        orderStatus = 'Payment Expired';
+      } else if (status === 'Canceled' || status === 'Cancelled') {
+        paymentInfoStatus = 'Canceled';
+        orderStatus = 'Payment Canceled';
       } else {
-        res.status(400).json({
-          success: false,
-          message: "Payment verification failed",
-          status: verificationResponse.status
-        });
+        paymentInfoStatus = status;
+        orderStatus = 'Payment Pending';
       }
+
+      await Order.updateMany(
+        { _id: { $in: orderIdArray } },
+        {
+          $set: {
+            'paymentInfo.id': verificationResponse.transaction_id || pidx,
+            'paymentInfo.type': 'Khalti',
+            'paymentInfo.status': paymentInfoStatus,
+            'paymentInfo.khalti_fee': verificationResponse.fee || 0,
+            status: orderStatus,
+            ...(isCompleted && { paidAt: new Date() }),
+          }
+        }
+      );
+
+      const updatedOrders = await Order.find({ _id: { $in: orderIdArray } });
+
+      res.status(isCompleted ? 200 : 400).json({
+        success: isCompleted,
+        message: isCompleted
+          ? 'Payment verified and orders updated successfully'
+          : `Payment ${status}`,
+        status,
+        orders: updatedOrders,
+        transactionDetails: verificationResponse,
+      });
 
     } catch (error) {
       console.error("Khalti payment verification error:", error);
@@ -523,7 +467,7 @@ router.get(
         return next(new ErrorHandler("Missing pidx parameter", 400));
       }
 
-      const response = await makeKhaltiApiCall("lookup/", { pidx });
+      const response = await lookupKhaltiPayment(pidx);
 
       // Find orders with this pidx
       const orders = await Order.find({ 'paymentInfo.pidx': pidx });

@@ -424,7 +424,7 @@ const CreateProduct = () => {
             width: 10px;
             height: 10px;
             border-radius: 999px;
-            background: linear-gradient(90deg, #ec4899, #a855f7);
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
             box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
             display: inline-block;
           }
@@ -444,7 +444,7 @@ const CreateProduct = () => {
             color: #fff;
             padding: 6px 10px;
             border-radius: 999px;
-            background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
           }
 
           .gc_backBtn {
@@ -490,7 +490,7 @@ const CreateProduct = () => {
           .gc_cardTopLine {
             height: 5px;
             width: 100%;
-            background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
           }
           .gc_cardHeader {
             padding: 16px 18px;
@@ -678,7 +678,7 @@ const CreateProduct = () => {
             border-radius: 16px;
             font-weight: 900;
             color: #fff;
-            background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
             box-shadow: 0 10px 22px rgba(168, 85, 247, 0.22);
             transition: 160ms ease;
           }

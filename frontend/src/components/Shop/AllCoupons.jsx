@@ -173,15 +173,14 @@ const AllCoupons = () => {
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Search coupon..."
                       className="w-full sm:w-[260px] pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white
-                                 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                                 focus:outline-none focus:border-[#a67861] focus:ring-2 focus:ring-[#ead7c8] transition"
                     />
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setOpen(true)}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-extrabold text-white
-                               bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 shadow-lg hover:shadow-xl transition"
+                    className="btn-primary !min-h-0 px-4 py-2.5 !rounded-xl !font-extrabold"
                   >
                     <FiPlus />
                     Create Coupon
@@ -192,7 +191,10 @@ const AllCoupons = () => {
 
             {/* Table */}
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-              <div className="h-[5px] w-full bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600" />
+              <div
+                className="h-[5px] w-full"
+                style={{ background: "linear-gradient(90deg, var(--color-accent), var(--color-accent-strong))" }}
+              />
               <div className="p-2 md:p-4">
                 <DataGrid rows={rows} columns={columns} pageSize={10} disableSelectionOnClick autoHeight className="gc_grid" />
               </div>
@@ -216,14 +218,14 @@ const AllCoupons = () => {
               <div className="fixed inset-0 bg-black/50 z-[20000] flex items-center justify-center p-4">
                 <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
                   {/* Modal header */}
-                  <div className="bg-gradient-to-r from-[#1a2240] to-[#3d569a] p-6 text-white flex items-center justify-between">
+                  <div className="accent-panel border-b border-[var(--color-border)] p-6 flex items-center justify-between">
                     <div>
-                      <h3 className="text-xl font-extrabold">Create Coupon</h3>
-                      <p className="text-white/80 text-sm mt-1">Set discount, limits and optional product.</p>
+                      <h3 className="text-xl font-extrabold text-[var(--color-text)]">Create Coupon</h3>
+                      <p className="text-[var(--color-muted)] text-sm mt-1">Set discount, limits and optional product.</p>
                     </div>
                     <button
                       onClick={() => setOpen(false)}
-                      className="p-2 rounded-full hover:bg-white/15 transition"
+                      className="p-2 rounded-full hover:bg-[var(--color-surface)] transition text-[var(--color-text)]"
                       aria-label="Close"
                     >
                       <RxCross1 size={22} />
@@ -245,7 +247,7 @@ const AllCoupons = () => {
                             onChange={(e) => setName(e.target.value)}
                             placeholder="e.g. NEWYEAR10"
                             className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200
-                                       focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                                       focus:outline-none focus:border-[#a67861] focus:ring-2 focus:ring-[#ead7c8] transition"
                           />
                         </div>
 
@@ -261,7 +263,7 @@ const AllCoupons = () => {
                             placeholder="10"
                             min="0"
                             className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200
-                                       focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                                       focus:outline-none focus:border-[#a67861] focus:ring-2 focus:ring-[#ead7c8] transition"
                           />
                         </div>
 
@@ -269,7 +271,7 @@ const AllCoupons = () => {
                           <label className="text-sm font-semibold text-gray-700">Selected Product</label>
                           <select
                             className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white
-                                       focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                                       focus:outline-none focus:border-[#a67861] focus:ring-2 focus:ring-[#ead7c8] transition"
                             value={selectedProducts}
                             onChange={(e) => setSelectedProducts(e.target.value)}
                           >
@@ -291,7 +293,7 @@ const AllCoupons = () => {
                             placeholder="Optional"
                             min="0"
                             className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200
-                                       focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                                       focus:outline-none focus:border-[#a67861] focus:ring-2 focus:ring-[#ead7c8] transition"
                           />
                         </div>
 
@@ -304,7 +306,7 @@ const AllCoupons = () => {
                             placeholder="Optional"
                             min="0"
                             className="mt-2 w-full px-4 py-3 rounded-xl border border-gray-200
-                                       focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition"
+                                       focus:outline-none focus:border-[#a67861] focus:ring-2 focus:ring-[#ead7c8] transition"
                           />
                         </div>
                       </div>
@@ -320,8 +322,7 @@ const AllCoupons = () => {
                         </button>
                         <button
                           type="submit"
-                          className="w-full sm:flex-1 px-5 py-3 rounded-xl font-extrabold text-white
-                                     bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 shadow-lg hover:shadow-xl transition"
+                          className="btn-primary !w-full sm:!flex-1 px-5 py-3 !rounded-xl !font-extrabold"
                         >
                           Create Coupon
                         </button>
@@ -339,8 +340,8 @@ const AllCoupons = () => {
               width: 10px;
               height: 10px;
               border-radius: 999px;
-              background: linear-gradient(90deg, #ec4899, #a855f7);
-              box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+              background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+              box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.12);
               display: inline-block;
             }
 

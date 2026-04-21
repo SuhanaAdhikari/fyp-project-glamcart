@@ -85,27 +85,33 @@ const TrackOrder = () => {
 
   if (!order) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center text-[#6b6f86]">
-        Order not found.
+      <div className="page-shell">
+        <div className="section-shell py-12">
+          <div className="surface-card flex min-h-[360px] items-center justify-center text-[var(--color-muted)]">
+            Order not found.
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff7fb] via-white to-[#f6f7ff] py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+    <div className="page-shell">
+      <div className="section-shell px-4 py-10">
+        <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div className="mb-10 text-center">
-          <h1 className="text-3xl font-extrabold text-[#14152b]">
+          <span className="eyebrow">Order tracking</span>
+          <h1 className="mt-5 text-3xl font-extrabold text-[var(--color-text)]">
             Track Your Order
           </h1>
-          <p className="text-sm text-[#6b6f86] mt-2">
-            Order ID: <span className="font-mono">{order._id}</span>
+          <p className="mt-2 text-sm text-[var(--color-muted)]">
+            Order ID: <span className="font-mono text-[var(--color-text)]">{order._id}</span>
           </p>
         </div>
 
         {/* Timeline */}
-        <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(20,21,43,0.10)] border border-[#edf0ff] p-8">
+        <div className="surface-card p-8">
           <div className="space-y-8">
             {STATUS_FLOW.map((status, index) => {
               const meta = STATUS_META[status]
@@ -120,25 +126,31 @@ const TrackOrder = () => {
                   {/* Icon */}
                   <div className="flex flex-col items-center">
                     <div
-                      className={[
-                        "w-12 h-12 rounded-full flex items-center justify-center transition-all",
-                        isCompleted
-                          ? "bg-green-500 text-white"
-                          : isActive
-                          ? "bg-gradient-to-r from-[#ff5aa5] to-[#7b61ff] text-white shadow-lg"
-                          : "bg-[#f0f2ff] text-[#9aa0c3]",
-                      ].join(" ")}
+                      className="flex h-12 w-12 items-center justify-center rounded-full border transition-all"
+                      style={
+                        isCompleted || isActive
+                          ? {
+                              background: "var(--color-accent-strong)",
+                              borderColor: "var(--color-accent-strong)",
+                              color: "#ffffff",
+                              boxShadow: "0 16px 30px rgba(136, 94, 74, 0.18)",
+                            }
+                          : {
+                              background: "var(--color-surface-soft)",
+                              borderColor: "var(--color-border)",
+                              color: "var(--color-muted)",
+                            }
+                      }
                     >
                       <Icon size={20} />
                     </div>
 
                     {index !== STATUS_FLOW.length - 1 && (
                       <div
-                        className={`w-[2px] h-10 ${
-                          index < currentIndex
-                            ? "bg-green-400"
-                            : "bg-[#e8e9ff]"
-                        }`}
+                        className="h-10 w-[2px]"
+                        style={{
+                          background: index < currentIndex ? "var(--color-accent)" : "var(--color-border)",
+                        }}
                       />
                     )}
                   </div>
@@ -146,20 +158,16 @@ const TrackOrder = () => {
                   {/* Content */}
                   <div className="pt-1">
                     <h3
-                      className={`font-bold ${
-                        isActive
-                          ? "text-[#14152b]"
-                          : "text-[#6b6f86]"
-                      }`}
+                      className={`font-bold ${isActive ? "text-[var(--color-text)]" : "text-[var(--color-muted)]"}`}
                     >
                       {meta.label}
                     </h3>
-                    <p className="text-sm text-[#6b6f86]">
+                    <p className="text-sm text-[var(--color-muted)]">
                       {meta.desc}
                     </p>
 
                     {isActive && (
-                      <span className="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-[#fff1f4] text-[#d23a56]">
+                      <span className="status-chip status-chip--primary mt-2">
                         Current Status
                       </span>
                     )}
@@ -169,6 +177,7 @@ const TrackOrder = () => {
             })}
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

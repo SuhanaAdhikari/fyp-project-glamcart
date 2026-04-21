@@ -133,7 +133,7 @@ const WithdrawMoney = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 flex items-center gap-2">
-                <FiDollarSign className="text-pink-500" /> Withdraw Money
+                <FiDollarSign className="text-[var(--color-accent-strong)]" /> Withdraw Money
               </h2>
               <p className="text-sm text-gray-600 mt-1">Manage your earnings and withdrawal requests.</p>
             </div>
@@ -211,7 +211,7 @@ const WithdrawMoney = () => {
               <div className="rounded-2xl border border-gray-200 bg-white p-6">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-extrabold text-gray-900 flex items-center gap-2">
-                    <FiCreditCard className="text-pink-500" /> Withdrawal Method
+                    <FiCreditCard className="text-[var(--color-accent-strong)]" /> Withdrawal Method
                   </p>
                 </div>
 
@@ -476,8 +476,8 @@ const WithdrawMoney = () => {
           width: 10px;
           height: 10px;
           border-radius: 999px;
-          background: linear-gradient(90deg, #ec4899, #a855f7);
-          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+          box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.12);
           display: inline-block;
         }
 
@@ -490,7 +490,7 @@ const WithdrawMoney = () => {
         .gc_cardTopLine {
           height: 5px;
           width: 100%;
-          background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
         }
 
         .gc_iconCircle {
@@ -500,9 +500,9 @@ const WithdrawMoney = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: rgba(236, 72, 153, 0.12);
-          border: 1px solid rgba(236, 72, 153, 0.22);
-          color: #111827;
+          background: var(--color-surface-soft);
+          border: 1px solid var(--color-border);
+          color: var(--color-accent-strong);
         }
         .gc_iconCircleBig {
           width: 60px;
@@ -511,9 +511,9 @@ const WithdrawMoney = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          background: rgba(168, 85, 247, 0.12);
-          border: 1px solid rgba(168, 85, 247, 0.22);
-          color: #111827;
+          background: var(--color-surface-soft);
+          border: 1px solid var(--color-border);
+          color: var(--color-accent-strong);
           flex: 0 0 auto;
         }
 
@@ -543,14 +543,14 @@ const WithdrawMoney = () => {
           border-radius: 16px;
           font-weight: 900;
           color: #fff;
-          background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
-          box-shadow: 0 10px 22px rgba(168, 85, 247, 0.22);
+          background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+          box-shadow: 0 10px 22px rgba(136, 94, 74, 0.18);
           transition: 160ms ease;
           width: fit-content;
         }
         .gc_primaryBtn:hover {
           transform: translateY(-1px);
-          box-shadow: 0 14px 30px rgba(168, 85, 247, 0.26);
+          box-shadow: 0 14px 30px rgba(136, 94, 74, 0.22);
         }
         .gc_disabledBtn {
           opacity: 0.65;
@@ -583,14 +583,14 @@ const WithdrawMoney = () => {
           gap: 8px;
           padding: 10px 14px;
           border-radius: 14px;
-          border: 1px solid rgba(239, 68, 68, 0.25);
-          background: rgba(239, 68, 68, 0.08);
-          color: #b91c1c;
+          border: 1px solid #dcc0b4;
+          background: #f3e2dc;
+          color: #8d4e3c;
           font-weight: 900;
           transition: 160ms ease;
         }
         .gc_dangerGhost:hover {
-          background: rgba(239, 68, 68, 0.14);
+          background: #ecd4cb;
         }
 
         .gc_infoPills {
@@ -605,15 +605,15 @@ const WithdrawMoney = () => {
           font-weight: 900;
           padding: 6px 10px;
           border-radius: 999px;
-          background: linear-gradient(90deg, rgba(236, 72, 153, 0.14), rgba(168, 85, 247, 0.14));
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          color: #111827;
+          background: var(--color-accent-soft);
+          border: 1px solid rgba(166, 120, 97, 0.22);
+          color: var(--color-accent-strong);
           line-height: 1;
         }
 
         .gc_modalHeader {
           padding: 14px 16px;
-          background: linear-gradient(90deg, rgba(236, 72, 153, 0.08), rgba(168, 85, 247, 0.08));
+          background: linear-gradient(90deg, rgba(234, 215, 200, 0.9), rgba(255, 255, 255, 0.9));
           border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           display: flex;
           align-items: center;
@@ -652,8 +652,8 @@ const WithdrawMoney = () => {
           transition: 160ms ease;
         }
         .gc_input:focus {
-          border-color: rgba(168, 85, 247, 0.65);
-          box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
+          border-color: rgba(166, 120, 97, 0.65);
+          box-shadow: 0 0 0 4px rgba(166, 120, 97, 0.15);
         }
 
         .gc_moneyWrap {
@@ -675,8 +675,8 @@ const WithdrawMoney = () => {
           transition: 160ms ease;
         }
         .gc_moneyInput:focus {
-          border-color: rgba(236, 72, 153, 0.65);
-          box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.14);
+          border-color: rgba(166, 120, 97, 0.65);
+          box-shadow: 0 0 0 4px rgba(166, 120, 97, 0.14);
         }
       `}</style>
     </div>

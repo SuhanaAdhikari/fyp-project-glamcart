@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { server } from "../../server"
 import axios from "axios"
-import { loadSeller } from "../../redux/actions/user"
 import { toast } from "react-toastify"
-import { FiUser, FiMapPin, FiPhone, FiMail, FiFileText, FiSave, FiCamera, FiInfo, FiHash } from "react-icons/fi"
+import { FiCamera, FiFileText, FiHash, FiInfo, FiMail, FiMapPin, FiPhone, FiSave, FiUser } from "react-icons/fi"
+
+import { loadSeller } from "../../redux/actions/user"
+import { server } from "../../server"
 
 const ShopSettings = () => {
   const { seller } = useSelector((state) => state.seller)
   const dispatch = useDispatch()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-
-  // Form states (keep same logic)
   const [avatar, setAvatar] = useState(null)
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -53,6 +52,7 @@ const ShopSettings = () => {
     reader.onload = async () => {
       if (reader.readyState === 2) {
         setAvatar(reader.result)
+
         try {
           await axios.put(`${server}/shop/update-shop-avatar`, { avatar: reader.result }, { withCredentials: true })
           dispatch(loadSeller())
@@ -87,397 +87,231 @@ const ShopSettings = () => {
     }
   }
 
-  return (
-    <div className="w-full min-h-screen px-4 md:px-8 pt-6 mt-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="inline-flex items-center gap-2">
-            <span className="gc_dot" />
-            <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">Settings</p>
-          </div>
+  const profileStats = [
+    { label: "Email", value: email || "-" },
+    { label: "Phone", value: phoneNumber || "-" },
+    { label: "Zip Code", value: zipCode || "-" },
+  ]
 
-          <div className="mt-2 flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">Shop Settings</h1>
-              <p className="text-sm text-gray-600 mt-1">Update your shop profile, contact info and description.</p>
+  return (
+    <div className="w-full p-4 md:p-6">
+      <div className="space-y-6">
+        <div className="surface-card accent-panel p-5 md:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <span className="eyebrow">Seller Settings</span>
+              <h1 className="mt-4 text-3xl font-extrabold text-[var(--color-text)] md:text-4xl">Refine your shop profile</h1>
+              <p className="mt-3 text-sm leading-6 text-[var(--color-muted)] md:text-base">
+                Keep your storefront details consistent so buyers immediately understand who you are and how to reach
+                you.
+              </p>
             </div>
 
             <button
               type="submit"
               form="shop-settings-form"
               disabled={isSubmitting}
-              className={`hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl font-extrabold text-white
-                          bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 shadow-lg hover:shadow-xl transition
-                          ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
+              className={`btn-primary hidden sm:inline-flex ${isSubmitting ? "cursor-not-allowed opacity-70" : ""}`}
             >
               <FiSave />
-              Save
+              {isSubmitting ? "Saving..." : "Save changes"}
             </button>
           </div>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <div className="h-[5px] w-full bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600" />
+        <div className="grid gap-6 xl:grid-cols-[minmax(300px,360px)_minmax(0,1fr)]">
+          <aside className="space-y-6">
+            <div className="surface-card p-5 md:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-accent-strong)]">
+                    Brand Identity
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-[var(--color-text)]">{seller?.name || "Your Shop"}</h2>
+                  <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
+                    These details shape the way customers see your store across product pages, orders, and search
+                    results.
+                  </p>
+                </div>
 
-          {/* Hero */}
-          <div className="relative px-6 md:px-8 py-6 bg-white">
-            <div className="gc_softGlow" />
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative">
-              <div>
-                <h2 className="text-xl md:text-2xl font-extrabold text-gray-900">Profile & Branding</h2>
-                <p className="text-sm text-gray-600 mt-1">Your logo and details are visible to customers.</p>
+                <span className="muted-chip">
+                  <FiInfo size={14} />
+                  Public profile
+                </span>
               </div>
 
-              <span className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gray-50 border border-gray-200 text-xs font-extrabold text-gray-900">
-                <FiInfo className="text-gray-700" />
-                Public profile
-              </span>
-            </div>
-          </div>
-
-          {/* Body */}
-          <div className="p-6 md:p-8">
-            {/* Avatar row */}
-            <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
-              <div className="relative w-max">
-                <div className={`gc_avatarRing ${isUploading ? "opacity-80" : ""}`}>
-                  <div className="gc_avatarInner">
+              <div className="mt-6 flex flex-col items-center rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface-soft)] px-5 py-6 text-center">
+                <div
+                  className={`relative h-[132px] w-[132px] rounded-full p-[4px] shadow-[var(--shadow-soft)] ${isUploading ? "opacity-80" : ""}`}
+                  style={{ background: "linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))" }}
+                >
+                  <div className="h-full w-full overflow-hidden rounded-full border-[4px] border-white bg-white">
                     <img
                       src={avatar || seller?.avatar?.url || "/placeholder.svg"}
                       alt={seller?.name || "Shop"}
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                     />
                   </div>
 
                   {isUploading && (
-                    <div className="absolute inset-0 grid place-items-center bg-black/25 rounded-full">
-                      <div className="w-9 h-9 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="absolute inset-0 grid place-items-center rounded-full bg-black/25">
+                      <div className="h-9 w-9 animate-spin rounded-full border-4 border-white border-t-transparent" />
                     </div>
                   )}
                 </div>
 
-                <div className="absolute -bottom-1 -right-1">
+                <div className="mt-5">
                   <input type="file" id="avatar-upload" className="hidden" onChange={handleImage} accept="image/*" />
-                  <label htmlFor="avatar-upload" className="gc_fab" title="Change logo">
-                    <FiCamera size={18} />
+                  <label htmlFor="avatar-upload" className="btn-secondary cursor-pointer">
+                    <FiCamera />
+                    {isUploading ? "Uploading..." : "Change logo"}
                   </label>
                 </div>
+
+                <p className="mt-4 text-sm leading-6 text-[var(--color-muted)]">
+                  JPG, PNG, or WebP. Keep the file under 5MB for a sharper and faster storefront.
+                </p>
               </div>
 
-              <div className="flex-1">
-                <h3 className="text-lg md:text-xl font-extrabold text-gray-900">{seller?.name || "Your Shop"}</h3>
-                <p className="text-sm text-gray-600 mt-1">JPG/PNG/WebP • Max 5MB • Square logo recommended.</p>
-
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="gc_stat">
-                    <p className="gc_statLabel">EMAIL</p>
-                    <p className="gc_statValue truncate">{email || "-"}</p>
+              <div className="mt-6 grid gap-3">
+                {profileStats.map((item) => (
+                  <div key={item.label} className="surface-card-sm accent-panel px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{item.label}</p>
+                    <p className="mt-1 truncate text-sm font-semibold text-[var(--color-text)]">{item.value}</p>
                   </div>
-                  <div className="gc_stat">
-                    <p className="gc_statLabel">PHONE</p>
-                    <p className="gc_statValue truncate">{phoneNumber || "-"}</p>
-                  </div>
-                  <div className="gc_stat">
-                    <p className="gc_statLabel">ZIP</p>
-                    <p className="gc_statValue truncate">{zipCode || "-"}</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Form */}
-            <form id="shop-settings-form" onSubmit={updateHandler} className="space-y-7">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="gc_field">
-                  <label className="gc_label">
-                    <FiUser className="gc_icon" /> Shop Name <span className="text-red-500">*</span>
+            <div className="surface-card-sm accent-panel p-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-[14px] bg-white text-[var(--color-accent-strong)]">
+                  <FiInfo />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[var(--color-text)]">Keep it clean and trustworthy</p>
+                  <p className="mt-1 text-sm leading-6 text-[var(--color-muted)]">
+                    Customers are more likely to buy when your logo, contact number, and description feel complete and
+                    current.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div className="surface-card p-5 md:p-6">
+            <div className="border-b border-[var(--color-border)] pb-5">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-accent-strong)]">
+                Profile Details
+              </p>
+              <h2 className="mt-2 text-2xl font-bold text-[var(--color-text)]">Storefront information</h2>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
+                Update the details customers use to recognize your store and contact you without friction.
+              </p>
+            </div>
+
+            <form id="shop-settings-form" onSubmit={updateHandler} className="mt-6 space-y-6">
+              <div className="grid gap-5 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+                    <FiUser className="text-[var(--color-accent-strong)]" /> Shop Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder="Enter shop name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="gc_input"
+                    className="field-input"
                     required
                   />
                 </div>
 
-                <div className="gc_field">
-                  <label className="gc_label">
-                    <FiMail className="gc_icon" /> Email Address
+                <div>
+                  <label className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+                    <FiMail className="text-[var(--color-accent-strong)]" /> Email Address
                   </label>
-                  <input type="email" value={email} className="gc_input gc_readonly" readOnly />
-                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                  <input
+                    type="email"
+                    value={email}
+                    className="field-input cursor-not-allowed bg-[var(--color-surface-soft)] text-[var(--color-muted)]"
+                    readOnly
+                  />
+                  <p className="mt-2 text-xs text-[var(--color-muted)]">Email is tied to your seller account.</p>
                 </div>
 
-                <div className="gc_field">
-                  <label className="gc_label">
-                    <FiPhone className="gc_icon" /> Phone Number <span className="text-red-500">*</span>
+                <div>
+                  <label className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+                    <FiPhone className="text-[var(--color-accent-strong)]" /> Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
                     placeholder="Enter phone number"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="gc_input"
+                    className="field-input"
                     required
                   />
                 </div>
 
-                <div className="gc_field">
-                  <label className="gc_label">
-                    <FiHash className="gc_icon" /> Zip Code <span className="text-red-500">*</span>
+                <div>
+                  <label className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+                    <FiHash className="text-[var(--color-accent-strong)]" /> Zip Code <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder="Enter zip code"
                     value={zipCode}
                     onChange={(e) => setZipcode(e.target.value)}
-                    className="gc_input"
+                    className="field-input"
                     required
                   />
                 </div>
 
-                <div className="gc_field md:col-span-2">
-                  <label className="gc_label">
-                    <FiMapPin className="gc_icon" /> Shop Address <span className="text-red-500">*</span>
+                <div className="md:col-span-2">
+                  <label className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+                    <FiMapPin className="text-[var(--color-accent-strong)]" /> Shop Address <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder="Enter shop address"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    className="gc_input"
+                    className="field-input"
                     required
                   />
                 </div>
 
-                <div className="gc_field md:col-span-2">
-                  <label className="gc_label">
-                    <FiFileText className="gc_icon" /> Shop Description
+                <div className="md:col-span-2">
+                  <label className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text)]">
+                    <FiFileText className="text-[var(--color-accent-strong)]" /> Shop Description
                   </label>
                   <textarea
                     placeholder="Tell customers what you sell and what makes your shop special..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="gc_textarea"
+                    className="field-textarea"
                   />
-                  <p className="text-xs text-gray-500 mt-1">This appears on your shop page.</p>
+                  <p className="mt-2 text-xs text-[var(--color-muted)]">This text appears on your public shop page.</p>
                 </div>
               </div>
 
-              {/* Info box */}
-              <div className="gc_infoBox">
-                <FiInfo className="gc_infoIcon" />
-                <div>
-                  <p className="font-extrabold text-gray-900">Tip</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Keep your logo and contact details accurate to build customer trust.
-                  </p>
-                </div>
-              </div>
+              <div className="flex flex-col gap-3 border-t border-[var(--color-border)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm leading-6 text-[var(--color-muted)]">
+                  Saving refreshes the information buyers see when they open your storefront.
+                </p>
 
-              {/* Mobile Save */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`sm:hidden w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl font-extrabold text-white
-                            bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600 shadow-lg hover:shadow-xl transition
-                            ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-1 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <FiSave />
-                    Save Changes
-                  </>
-                )}
-              </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`btn-primary w-full sm:w-auto ${isSubmitting ? "cursor-not-allowed opacity-70" : ""}`}
+                >
+                  <FiSave />
+                  {isSubmitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
-
-        {/* GlamCart5 theme styles */}
-        <style jsx global>{`
-          .gc_dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #ec4899, #a855f7);
-            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
-            display: inline-block;
-          }
-
-          .gc_softGlow {
-            position: absolute;
-            inset: -60px;
-            background: radial-gradient(circle at 20% 30%, rgba(236, 72, 153, 0.14), transparent 45%),
-              radial-gradient(circle at 70% 20%, rgba(168, 85, 247, 0.14), transparent 45%),
-              radial-gradient(circle at 60% 80%, rgba(124, 58, 237, 0.12), transparent 45%);
-            pointer-events: none;
-          }
-
-          .gc_avatarRing {
-            width: 118px;
-            height: 118px;
-            border-radius: 999px;
-            padding: 4px;
-            background: linear-gradient(135deg, #ec4899, #a855f7, #7c3aed);
-            box-shadow: 0 20px 40px rgba(17, 24, 39, 0.16);
-            position: relative;
-          }
-          @media (min-width: 768px) {
-            .gc_avatarRing {
-              width: 132px;
-              height: 132px;
-            }
-          }
-          .gc_avatarInner {
-            width: 100%;
-            height: 100%;
-            border-radius: 999px;
-            overflow: hidden;
-            border: 4px solid #ffffff;
-            background: #f8fafc;
-          }
-
-          .gc_fab {
-            width: 42px;
-            height: 42px;
-            border-radius: 999px;
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-            color: white;
-            background: linear-gradient(135deg, #ec4899, #a855f7, #7c3aed);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            box-shadow: 0 18px 30px rgba(17, 24, 39, 0.18);
-            transition: transform 160ms ease, box-shadow 160ms ease;
-          }
-          .gc_fab:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 22px 40px rgba(17, 24, 39, 0.22);
-          }
-
-          .gc_stat {
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: linear-gradient(
-              90deg,
-              rgba(236, 72, 153, 0.06),
-              rgba(168, 85, 247, 0.06),
-              rgba(124, 58, 237, 0.05)
-            );
-            border-radius: 18px;
-            padding: 10px 12px;
-            box-shadow: 0 14px 26px rgba(17, 24, 39, 0.08);
-          }
-          .gc_statLabel {
-            font-size: 11px;
-            font-weight: 900;
-            color: rgba(17, 24, 39, 0.55);
-            letter-spacing: 0.08em;
-          }
-          .gc_statValue {
-            margin-top: 4px;
-            font-weight: 900;
-            color: #111827;
-            font-size: 13px;
-          }
-
-          .gc_field {
-            display: flex;
-            flex-direction: column;
-          }
-          .gc_label {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 900;
-            color: rgba(17, 24, 39, 0.75);
-            margin-bottom: 8px;
-          }
-          .gc_icon {
-            color: rgba(17, 24, 39, 0.55);
-          }
-
-          .gc_input {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            background: #fff;
-            outline: none;
-            transition: 160ms ease;
-            font-weight: 800;
-            color: #111827;
-            box-shadow: 0 10px 18px rgba(17, 24, 39, 0.05);
-          }
-          .gc_input:focus {
-            border-color: rgba(168, 85, 247, 0.55);
-            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.18), 0 14px 24px rgba(17, 24, 39, 0.06);
-          }
-          .gc_readonly {
-            background: rgba(248, 250, 252, 0.9);
-            color: rgba(17, 24, 39, 0.55);
-          }
-
-          .gc_textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px 14px;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            background: #fff;
-            outline: none;
-            transition: 160ms ease;
-            font-weight: 800;
-            color: #111827;
-            resize: vertical;
-            box-shadow: 0 10px 18px rgba(17, 24, 39, 0.05);
-          }
-          .gc_textarea:focus {
-            border-color: rgba(236, 72, 153, 0.55);
-            box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.16), 0 14px 24px rgba(17, 24, 39, 0.06);
-          }
-
-          .gc_infoBox {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-            border-radius: 20px;
-            padding: 14px 14px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: linear-gradient(
-              90deg,
-              rgba(236, 72, 153, 0.08),
-              rgba(168, 85, 247, 0.08),
-              rgba(124, 58, 237, 0.07)
-            );
-          }
-          .gc_infoIcon {
-            color: #7c3aed;
-            margin-top: 2px;
-          }
-        `}</style>
       </div>
     </div>
   )

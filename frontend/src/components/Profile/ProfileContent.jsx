@@ -80,34 +80,34 @@ const ProfileContent = ({ active }) => {
       {/* Profile */}
       {active === 1 && (
         <div className="w-full p-4 md:p-6">
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
+          <div className="surface-card p-5 md:p-6">
             <div className="flex flex-col items-center">
               <div className="relative">
                 <img
                   src={user?.avatar?.url || "/placeholder.svg"}
-                  className="w-[140px] h-[140px] rounded-full object-cover border-[3px] border-black"
+                  className="h-[140px] w-[140px] rounded-full border-[3px] border-[var(--color-border)] object-cover shadow-[0_20px_40px_rgba(23,33,43,0.14)]"
                   alt="User Avatar"
                 />
-                <div className="w-[36px] h-[36px] bg-white rounded-full flex items-center justify-center cursor-pointer absolute bottom-[6px] right-[6px] shadow-md hover:bg-gray-100 transition-colors border border-gray-200">
+                <div className="surface-card-sm absolute bottom-[6px] right-[6px] flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-white transition-colors">
                   <input type="file" id="image" className="hidden" onChange={handleImage} />
                   <label htmlFor="image" className="cursor-pointer">
-                    <AiOutlineCamera className="text-gray-900" />
+                    <AiOutlineCamera className="text-[var(--color-accent-strong)]" />
                   </label>
                 </div>
               </div>
 
-              <h2 className="mt-4 text-xl font-semibold text-gray-900">{user?.name || "User"}</h2>
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              <h2 className="mt-4 text-xl font-semibold text-[var(--color-text)]">{user?.name || "User"}</h2>
+              <p className="text-sm text-[var(--color-muted)]">{user?.email}</p>
             </div>
 
             <div className="mt-8">
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block pb-2 text-gray-700 font-semibold">Full Name</label>
+                    <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Full Name</label>
                     <input
                       type="text"
-                      className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+                      className="field-input"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -115,10 +115,10 @@ const ProfileContent = ({ active }) => {
                   </div>
 
                   <div>
-                    <label className="block pb-2 text-gray-700 font-semibold">Email Address</label>
+                    <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Email Address</label>
                     <input
                       type="text"
-                      className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+                      className="field-input"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -126,10 +126,10 @@ const ProfileContent = ({ active }) => {
                   </div>
 
                   <div>
-                    <label className="block pb-2 text-gray-700 font-semibold">Phone Number</label>
+                    <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Phone Number</label>
                     <input
                       type="number"
-                      className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+                      className="field-input"
                       required
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
@@ -137,10 +137,10 @@ const ProfileContent = ({ active }) => {
                   </div>
 
                   <div>
-                    <label className="block pb-2 text-gray-700 font-semibold">Enter your password</label>
+                    <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Enter your password</label>
                     <input
                       type="password"
-                      className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+                      className="field-input"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -150,7 +150,7 @@ const ProfileContent = ({ active }) => {
 
                 <button
                   type="submit"
-                  className="mt-6 h-11 px-6 rounded-xl bg-black text-white text-sm font-semibold hover:opacity-90 transition"
+                  className="btn-primary mt-6"
                 >
                   Update Profile
                 </button>
@@ -212,11 +212,7 @@ const AllOrders = () => {
         const v = params.value
         const ok = v === "Delivered"
         return (
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ring-1 ${
-              ok ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-rose-50 text-rose-700 ring-rose-200"
-            }`}
-          >
+          <span className={ok ? "status-chip status-chip--success" : "status-chip status-chip--danger"}>
             {v}
           </span>
         )
@@ -232,8 +228,8 @@ const AllOrders = () => {
       sortable: false,
       renderCell: (params) => (
         <Link to={`/user/order/${params.id}`}>
-          <button className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition">
-            <AiOutlineArrowRight size={18} className="text-gray-900" />
+          <button className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0">
+            <AiOutlineArrowRight size={18} className="text-[var(--color-text)]" />
           </button>
         </Link>
       ),
@@ -251,14 +247,14 @@ const AllOrders = () => {
 
   return (
     <div className="w-full p-4 md:p-6">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="surface-card overflow-hidden">
         <div className="px-5 py-4 md:px-6">
-          <h3 className="text-lg font-semibold text-gray-900">My Orders</h3>
-          <p className="text-sm text-gray-500 mt-1">All your recent orders.</p>
+          <h3 className="text-lg font-semibold text-[var(--color-text)]">My Orders</h3>
+          <p className="mt-1 text-sm text-[var(--color-muted)]">All your recent orders.</p>
         </div>
 
         <div className="px-2 md:px-4 pb-4">
-          <div className="rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="surface-card-sm overflow-hidden bg-white">
             <DataGrid rows={rows} columns={columns} pageSize={10} disableSelectionOnClick autoHeight sx={gridSx} />
           </div>
         </div>
@@ -294,8 +290,8 @@ const AllRefundOrders = () => {
       sortable: false,
       renderCell: (params) => (
         <Link to={`/user/order/${params.id}`}>
-          <button className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition">
-            <AiOutlineArrowRight size={18} className="text-gray-900" />
+          <button className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0">
+            <AiOutlineArrowRight size={18} className="text-[var(--color-text)]" />
           </button>
         </Link>
       ),
@@ -313,14 +309,14 @@ const AllRefundOrders = () => {
 
   return (
     <div className="w-full p-4 md:p-6">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="surface-card overflow-hidden">
         <div className="px-5 py-4 md:px-6">
-          <h3 className="text-lg font-semibold text-gray-900">Refund Requests</h3>
-          <p className="text-sm text-gray-500 mt-1">Orders currently in refund processing.</p>
+          <h3 className="text-lg font-semibold text-[var(--color-text)]">Refund Requests</h3>
+          <p className="mt-1 text-sm text-[var(--color-muted)]">Orders currently in refund processing.</p>
         </div>
 
         <div className="px-2 md:px-4 pb-4">
-          <div className="rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="surface-card-sm overflow-hidden bg-white">
             <DataGrid rows={rows} columns={columns} pageSize={10} disableSelectionOnClick autoHeight sx={gridSx} />
           </div>
         </div>
@@ -352,8 +348,8 @@ const TrackOrder = () => {
       sortable: false,
       renderCell: (params) => (
         <Link to={`/user/track/order/${params.id}`}>
-          <button className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition">
-            <MdTrackChanges size={18} className="text-gray-900" />
+          <button className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0">
+            <MdTrackChanges size={18} className="text-[var(--color-text)]" />
           </button>
         </Link>
       ),
@@ -371,14 +367,14 @@ const TrackOrder = () => {
 
   return (
     <div className="w-full p-4 md:p-6">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="surface-card overflow-hidden">
         <div className="px-5 py-4 md:px-6">
-          <h3 className="text-lg font-semibold text-gray-900">Track Orders</h3>
-          <p className="text-sm text-gray-500 mt-1">Track current orders.</p>
+          <h3 className="text-lg font-semibold text-[var(--color-text)]">Track Orders</h3>
+          <p className="mt-1 text-sm text-[var(--color-muted)]">Track current orders.</p>
         </div>
 
         <div className="px-2 md:px-4 pb-4">
-          <div className="rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="surface-card-sm overflow-hidden bg-white">
             <DataGrid rows={rows} columns={columns} pageSize={10} disableSelectionOnClick autoHeight sx={gridSx} />
           </div>
         </div>
@@ -415,15 +411,15 @@ const ChangePassword = () => {
 
   return (
     <div className="w-full p-4 md:p-6">
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:p-6">
-        <h1 className="text-[22px] md:text-[26px] text-center font-semibold text-gray-900 pb-2">Change Password</h1>
+      <div className="surface-card p-5 md:p-6">
+        <h1 className="pb-2 text-center text-[22px] font-semibold text-[var(--color-text)] md:text-[26px]">Change Password</h1>
 
         <form onSubmit={passwordChangeHandler} className="mt-6 max-w-xl mx-auto space-y-4">
           <div>
-            <label className="block pb-2 text-gray-700 font-semibold">Old password</label>
+            <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Old password</label>
             <input
               type="password"
-              className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+              className="field-input"
               required
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
@@ -431,10 +427,10 @@ const ChangePassword = () => {
           </div>
 
           <div>
-            <label className="block pb-2 text-gray-700 font-semibold">New password</label>
+            <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">New password</label>
             <input
               type="password"
-              className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+              className="field-input"
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -442,17 +438,17 @@ const ChangePassword = () => {
           </div>
 
           <div>
-            <label className="block pb-2 text-gray-700 font-semibold">Confirm password</label>
+            <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Confirm password</label>
             <input
               type="password"
-              className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+              className="field-input"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="w-full h-11 rounded-xl bg-black text-white font-semibold hover:opacity-90">
+          <button type="submit" className="btn-primary !w-full">
             Update Password
           </button>
         </form>
@@ -502,25 +498,25 @@ const Address = () => {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Add New Address</h2>
+          <div className="surface-card w-full max-w-xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-4">
+              <h2 className="text-lg font-semibold text-[var(--color-text)]">Add New Address</h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition"
+                className="surface-card-sm flex h-10 w-10 items-center justify-center rounded-[14px] bg-white transition"
               >
-                <RxCross1 size={18} className="text-gray-700" />
+                <RxCross1 size={18} className="text-[var(--color-text)]" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
               <div>
-                <label className="block pb-2 text-gray-700 font-semibold">Country</label>
+                <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Country</label>
                 <select
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  className="w-full h-11 rounded-xl border border-gray-200 px-3 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="field-select"
                 >
                   <option value="">Choose your country</option>
                   {Country.getAllCountries().map((item) => (
@@ -532,11 +528,11 @@ const Address = () => {
               </div>
 
               <div>
-                <label className="block pb-2 text-gray-700 font-semibold">City/State</label>
+                <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">City/State</label>
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full h-11 rounded-xl border border-gray-200 px-3 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="field-select"
                 >
                   <option value="">Choose your city</option>
                   {State.getStatesOfCountry(country).map((item) => (
@@ -548,9 +544,9 @@ const Address = () => {
               </div>
 
               <div>
-                <label className="block pb-2 text-gray-700 font-semibold">Address 1</label>
+                <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Address 1</label>
                 <input
-                  className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="field-input"
                   required
                   value={address1}
                   onChange={(e) => setAddress1(e.target.value)}
@@ -558,9 +554,9 @@ const Address = () => {
               </div>
 
               <div>
-                <label className="block pb-2 text-gray-700 font-semibold">Address 2</label>
+                <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Address 2</label>
                 <input
-                  className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="field-input"
                   required
                   value={address2}
                   onChange={(e) => setAddress2(e.target.value)}
@@ -568,10 +564,10 @@ const Address = () => {
               </div>
 
               <div>
-                <label className="block pb-2 text-gray-700 font-semibold">Zip Code</label>
+                <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Zip Code</label>
                 <input
                   type="number"
-                  className="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="field-input"
                   required
                   value={zipCode}
                   onChange={(e) => setZipCode(e.target.value)}
@@ -579,11 +575,11 @@ const Address = () => {
               </div>
 
               <div>
-                <label className="block pb-2 text-gray-700 font-semibold">Address Type</label>
+                <label className="mb-2 block text-sm font-medium text-[var(--color-text)]">Address Type</label>
                 <select
                   value={addressType}
                   onChange={(e) => setAddressType(e.target.value)}
-                  className="w-full h-11 rounded-xl border border-gray-200 px-3 focus:outline-none focus:ring-2 focus:ring-black"
+                  className="field-select"
                 >
                   <option value="">Choose your address type</option>
                   {addressTypeData.map((item) => (
@@ -594,7 +590,7 @@ const Address = () => {
                 </select>
               </div>
 
-              <button type="submit" className="w-full h-11 rounded-xl bg-black text-white font-semibold hover:opacity-90">
+              <button type="submit" className="btn-primary !w-full">
                 Add Address
               </button>
             </form>
@@ -605,13 +601,13 @@ const Address = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-[22px] md:text-[26px] font-semibold text-gray-900">My Addresses</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage saved delivery addresses.</p>
+          <h1 className="text-[22px] font-semibold text-[var(--color-text)] md:text-[26px]">My Addresses</h1>
+          <p className="mt-1 text-sm text-[var(--color-muted)]">Manage saved delivery addresses.</p>
         </div>
 
         <button
           type="button"
-          className="h-11 px-5 rounded-xl bg-black text-white font-semibold hover:opacity-90 transition"
+          className="btn-primary"
           onClick={() => setOpen(true)}
         >
           Add New
@@ -623,35 +619,35 @@ const Address = () => {
         {user?.addresses?.map((item, index) => (
           <div
             key={index}
-            className="rounded-2xl border border-gray-200 bg-white shadow-sm px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+            className="surface-card-sm flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between"
           >
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+              <span className="muted-chip">
                 {item.addressType}
               </span>
-              <div className="text-sm text-gray-700 font-medium">
+              <div className="text-sm font-medium text-[var(--color-text)]">
                 {item.address1} {item.address2}
               </div>
             </div>
 
             <div className="flex items-center justify-between md:justify-end gap-4">
-              <div className="text-sm text-gray-500">{user?.phoneNumber}</div>
+              <div className="text-sm text-[var(--color-muted)]">{user?.phoneNumber}</div>
               <button
                 type="button"
                 onClick={() => handleDelete(item)}
-                className="h-10 w-10 rounded-xl hover:bg-rose-50 flex items-center justify-center transition"
+                className="btn-danger !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
                 title="Delete address"
               >
-                <AiOutlineDelete size={20} className="text-rose-600" />
+                <AiOutlineDelete size={20} />
               </button>
             </div>
           </div>
         ))}
 
         {user?.addresses?.length === 0 && (
-          <div className="py-14 text-center rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <h5 className="text-lg font-semibold text-gray-900">No saved addresses</h5>
-            <p className="mt-2 text-sm text-gray-500">Add an address for faster checkout next time.</p>
+          <div className="surface-card py-14 text-center">
+            <h5 className="text-lg font-semibold text-[var(--color-text)]">No saved addresses</h5>
+            <p className="mt-2 text-sm text-[var(--color-muted)]">Add an address for faster checkout next time.</p>
           </div>
         )}
       </div>

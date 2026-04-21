@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { BsFillBagFill } from "react-icons/bs";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import styles from "../styles/styles";
 import { getAllOrdersOfUser } from "../redux/actions/order";
 import { server } from "../server";
 import { RxCross1 } from "react-icons/rx";
@@ -63,79 +62,98 @@ const UserOrderDetails = () => {
     })
   };
 
-  return (
-    <div className={`py-4 min-h-screen ${styles.section}`}>
-      <div className="w-full flex items-center justify-between">
-        <div className="flex items-center">
-          <BsFillBagFill size={30} color="crimson" />
-          <h1 className="pl-2 text-[25px]">Order Details</h1>
+  if (!data) {
+    return (
+      <div className="page-shell">
+        <div className="section-shell py-10">
+          <div className="surface-card flex min-h-[320px] items-center justify-center text-[var(--color-muted)]">
+            Loading order details...
+          </div>
         </div>
       </div>
+    );
+  }
 
-      <div className="w-full flex items-center justify-between pt-6">
-        <h5 className="text-[#00000084]">
-          Order ID: <span>#{data?._id?.slice(0, 8)}</span>
-        </h5>
-        <h5 className="text-[#00000084]">
-          Placed on: <span>{data?.createdAt?.slice(0, 10)}</span>
-        </h5>
-      </div>
+  return (
+    <div className="page-shell">
+      <div className="section-shell py-8">
+        <div className="surface-card p-5 md:p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] text-[var(--color-accent-strong)]">
+                <BsFillBagFill size={22} />
+              </div>
+              <div>
+                <h1 className="text-[25px] font-semibold text-[var(--color-text)]">Order Details</h1>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">Review items, payment, shipping, and refund options.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <span className="status-chip status-chip--muted">Order ID: #{data?._id?.slice(0, 8)}</span>
+              <span className="status-chip status-chip--neutral">Placed on: {data?.createdAt?.slice(0, 10)}</span>
+            </div>
+          </div>
+        </div>
 
       {/* order items */}
-      <br />
-      <br />
-      {data &&
-        data?.cart.map((item, index) => {
-          return(
-          <div className="w-full flex items-start mb-5">
-            <img
-              src={`${item.images[0]?.url}`}
-              alt=""
-              className="w-[80x] h-[80px]"
-            />
-            <div className="w-full">
-              <h5 className="pl-3 text-[20px]">{item.name}</h5>
-              <h5 className="pl-3 text-[20px] text-[#00000091]">
-                US${item.discountPrice} x {item.qty}
-              </h5>
-            </div>
-            {!item.isReviewed && data?.status === "Delivered" ?  <div
-                className={`${styles.button} text-[#fff]`}
-                onClick={() => setOpen(true) || setSelectedItem(item)}
-              >
-                Write a review
-              </div> : (
-             null
-            )}
+        <div className="mt-6 surface-card p-5 md:p-6">
+          <h2 className="text-lg font-semibold text-[var(--color-text)]">Items</h2>
+          <div className="mt-5 space-y-4">
+            {data?.cart.map((item) => {
+              return(
+              <div key={item?._id || item?.name} className="surface-card-sm flex flex-col gap-4 p-4 md:flex-row md:items-center">
+                <img
+                  src={`${item.images[0]?.url}`}
+                  alt={item.name}
+                  className="h-[88px] w-[88px] rounded-2xl border border-[var(--color-border)] object-cover"
+                />
+                <div className="flex-1">
+                  <h5 className="text-[20px] font-semibold text-[var(--color-text)]">{item.name}</h5>
+                  <h5 className="mt-1 text-[16px] text-[var(--color-muted)]">
+                    Rs. {item.discountPrice} x {item.qty}
+                  </h5>
+                </div>
+                {!item.isReviewed && data?.status === "Delivered" ? (
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={() => setOpen(true) || setSelectedItem(item)}
+                  >
+                    Write a review
+                  </button>
+                ) : null}
+              </div>
+              )
+             })}
           </div>
-          )
-         })}
+        </div>
 
       {/* review popup */}
       {open && (
-        <div className="w-full fixed top-0 left-0 h-screen bg-[#0005] z-50 flex items-center justify-center">
-          <div className="w-[50%] h-min bg-[#fff] shadow rounded-md p-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="surface-card w-full max-w-2xl p-4 md:p-6">
             <div className="w-full flex justify-end p-3">
               <RxCross1
                 size={30}
                 onClick={() => setOpen(false)}
-                className="cursor-pointer"
+                className="cursor-pointer text-[var(--color-text)]"
               />
             </div>
-            <h2 className="text-[30px] font-[500] font-Poppins text-center">
+            <h2 className="text-center text-[30px] font-[500] font-Poppins text-[var(--color-text)]">
               Give a Review
             </h2>
             <br />
-            <div className="w-full flex">
+            <div className="surface-card-sm flex w-full items-center gap-4 p-4">
               <img
                 src={`${selectedItem?.images[0]?.url}`}
-                alt=""
-                className="w-[80px] h-[80px]"
+                alt={selectedItem?.name}
+                className="h-[80px] w-[80px] rounded-2xl border border-[var(--color-border)] object-cover"
               />
               <div>
-                <div className="pl-3 text-[20px]">{selectedItem?.name}</div>
-                <h4 className="pl-3 text-[20px]">
-                  US${selectedItem?.discountPrice} x {selectedItem?.qty}
+                <div className="text-[20px] font-semibold text-[var(--color-text)]">{selectedItem?.name}</div>
+                <h4 className="mt-1 text-[18px] text-[var(--color-muted)]">
+                  Rs. {selectedItem?.discountPrice} x {selectedItem?.qty}
                 </h4>
               </div>
             </div>
@@ -144,7 +162,7 @@ const UserOrderDetails = () => {
             <br />
 
             {/* ratings */}
-            <h5 className="pl-3 text-[20px] font-[500]">
+            <h5 className="pl-3 text-[20px] font-[500] text-[var(--color-text)]">
               Give a Rating <span className="text-red-500">*</span>
             </h5>
             <div className="flex w-full ml-2 pt-1">
@@ -170,9 +188,9 @@ const UserOrderDetails = () => {
             </div>
             <br />
             <div className="w-full ml-3">
-              <label className="block text-[20px] font-[500]">
+              <label className="block text-[20px] font-[500] text-[var(--color-text)]">
                 Write a comment
-                <span className="ml-1 font-[400] text-[16px] text-[#00000052]">
+                <span className="ml-1 font-[400] text-[16px] text-[var(--color-muted)]">
                   (optional)
                 </span>
               </label>
@@ -184,60 +202,64 @@ const UserOrderDetails = () => {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="How was your product? write your expresion about it!"
-                className="mt-2 w-[95%] border p-2 outline-none"
+                className="field-textarea mt-2 w-[95%]"
               ></textarea>
             </div>
-            <div
-              className={`${styles.button} text-white text-[20px] ml-3`}
+            <button
+              type="button"
+              className="btn-primary ml-3 mt-4 text-[18px]"
               onClick={rating > 1 ? reviewHandler : null}
             >
               Submit
-            </div>
+            </button>
           </div>
         </div>
       )}
 
-      <div className="border-t w-full text-right">
-        <h5 className="pt-3 text-[18px]">
-          Total Price: <strong>US${data?.totalPrice}</strong>
-        </h5>
-      </div>
-      <br />
-      <br />
-      <div className="w-full 800px:flex items-center">
-        <div className="w-full 800px:w-[60%]">
-          <h4 className="pt-3 text-[20px] font-[600]">Shipping Address:</h4>
-          <h4 className="pt-3 text-[20px]">
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+          <div className="surface-card p-5 md:p-6">
+            <h4 className="text-[20px] font-[600] text-[var(--color-text)]">Shipping Address</h4>
+            <h4 className="pt-3 text-[18px] text-[var(--color-text)]">
             {data?.shippingAddress.address1 +
               " " +
               data?.shippingAddress.address2}
           </h4>
-          <h4 className=" text-[20px]">{data?.shippingAddress.country}</h4>
-          <h4 className=" text-[20px]">{data?.shippingAddress.city}</h4>
-          <h4 className=" text-[20px]">{data?.user?.phoneNumber}</h4>
-        </div>
-        <div className="w-full 800px:w-[40%]">
-          <h4 className="pt-3 text-[20px]">Payment Info:</h4>
-          <h4>
-            Status:{" "}
-            {data?.paymentInfo?.status ? data?.paymentInfo?.status : "Not Paid"}
-          </h4>
-          <br />
+            <h4 className="pt-2 text-[18px] text-[var(--color-muted)]">{data?.shippingAddress.country}</h4>
+            <h4 className="pt-2 text-[18px] text-[var(--color-muted)]">{data?.shippingAddress.city}</h4>
+            <h4 className="pt-2 text-[18px] text-[var(--color-muted)]">{data?.user?.phoneNumber}</h4>
+          </div>
+          <div className="surface-card p-5 md:p-6">
+            <h4 className="text-[20px] text-[var(--color-text)]">Payment Info</h4>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-sm text-[var(--color-muted)]">Status:</span>
+              <span className={data?.paymentInfo?.status ? "status-chip status-chip--success" : "status-chip status-chip--neutral"}>
+                {data?.paymentInfo?.status ? data?.paymentInfo?.status : "Not Paid"}
+              </span>
+            </div>
+            <div className="mt-5 border-t border-[var(--color-border)] pt-4">
+              <h5 className="text-[18px] text-[var(--color-text)]">
+                Total Price: <strong>Rs. {data?.totalPrice}</strong>
+              </h5>
+            </div>
            {
             data?.status === "Delivered" && (
-              <div className={`${styles.button} text-white`}
-              onClick={refundHandler}
-              >Give a Refund</div>
+              <button
+                type="button"
+                className="btn-primary mt-5"
+                onClick={refundHandler}
+              >
+                Give a Refund
+              </button>
             )
            }
+          </div>
+        </div>
+        <div className="mt-6">
+          <Link to="/">
+            <div className="btn-secondary w-fit">Send Message</div>
+          </Link>
         </div>
       </div>
-      <br />
-      <Link to="/">
-        <div className={`${styles.button} text-white`}>Send Message</div>
-      </Link>
-      <br />
-      <br />
     </div>
   );
 };

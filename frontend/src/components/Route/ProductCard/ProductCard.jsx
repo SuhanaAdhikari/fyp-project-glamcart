@@ -1,213 +1,122 @@
-import React, { useEffect, useState } from "react"
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai"
-import { Link } from "react-router-dom"
-import { useDispatch, useSelector } from "react-redux"
-import ProductDetailsCard from "../ProductDetailsCard/ProductDetailsCard"
-import { addToWishlist, removeFromWishlist } from "../../../redux/actions/wishlist"
-import { addTocart } from "../../../redux/actions/cart"
-import { toast } from "react-toastify"
-import Ratings from "../../Products/Ratings"
+import React from "react";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { addTocart } from "../../../redux/actions/cart";
+import { addToWishlist, removeFromWishlist } from "../../../redux/actions/wishlist";
+import Ratings from "../../Products/Ratings";
 
-const ProductCard = ({ data, isEvent }) => {
-  const { wishlist } = useSelector((state) => state.wishlist)
-  const { cart } = useSelector((state) => state.cart)
-  const [click, setClick] = useState(false)
-  const [open, setOpen] = useState(false)
-  const dispatch = useDispatch()
+const ProductCard = ({ data, isEvent = false }) => {
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (wishlist && wishlist.find((i) => i._id === data._id)) setClick(true)
-    else setClick(false)
-  }, [wishlist, data._id])
+  if (!data) return null;
 
-  const removeFromWishlistHandler = (item) => {
-    setClick(false)
-    dispatch(removeFromWishlist(item))
-  }
+  const isWishlisted = wishlist?.some((item) => item._id === data._id);
+  const productLink = isEvent ? `/product/${data._id}?isEvent=true` : `/product/${data._id}`;
+  const currentPrice = Number(data?.discountPrice ?? data?.originalPrice ?? 0);
+  const originalPrice = Number(data?.originalPrice ?? 0);
+  const hasDiscount = originalPrice > currentPrice;
+  const discountPercent = hasDiscount ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0;
+  const productCategory = data?.category || "Featured";
+  const shopName = data?.shop?.name || "GlamCart Store";
 
-  const addToWishlistHandler = (item) => {
-    setClick(true)
-    dispatch(addToWishlist(item))
-  }
+  const handleWishlist = () => {
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(data));
+      return;
+    }
 
-  const addToCartHandler = (id) => {
-    const isItemExists = cart && cart.find((i) => i._id === id)
-    if (isItemExists) return toast.error("Item already in cart!")
-    if (data.stock < 1) return toast.error("Product stock limited!")
+    dispatch(addToWishlist(data));
+  };
 
-    dispatch(addTocart({ ...data, qty: 1 }))
-    toast.success("Item added to cart successfully!")
-  }
+  const addToCartHandler = () => {
+    const isItemExists = cart?.find((item) => item._id === data._id);
+    if (isItemExists) return toast.error("Item is already in the cart.");
+    if (Number(data?.stock || 0) < 1) return toast.error("This product is out of stock.");
 
-  const productLink = isEvent ? `/product/${data._id}?isEvent=true` : `/product/${data._id}`
-
-  const showOriginal = Boolean(data.originalPrice)
-  const finalPrice = data.originalPrice === 0 ? data.originalPrice : data.discountPrice
-
-  const discountPercent =
-    showOriginal && data.originalPrice > 0
-      ? Math.round(((data.originalPrice - data.discountPrice) / data.originalPrice) * 100)
-      : null
+    dispatch(addTocart({ ...data, qty: 1 }));
+    toast.success("Item added to cart.");
+  };
 
   return (
-    <>
-      <div
-        className="
-          group relative
-          rounded-[26px]
-          border border-gray-200
-          bg-white
-          overflow-hidden
-          shadow-sm
-          hover:shadow-xl
-          transition-all duration-300
-        "
-      >
-        {/* Gradient ring (beauty style) */}
-        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition duration-300">
-          <div className="absolute -inset-[2px] rounded-[28px] bg-gradient-to-r from-pink-500/30 via-fuchsia-500/20 to-violet-600/30" />
+    <article className="group surface-card relative overflow-hidden !rounded-[28px] transition duration-200 hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(23,33,43,0.14)]">
+      <div className="relative">
+        <Link to={productLink} className="block overflow-hidden bg-[#fbf8f3]">
+          <img
+            src={data?.images?.[0]?.url || "/placeholder.svg"}
+            alt={data?.name || "Product"}
+            className="aspect-[4/5] h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+          />
+        </Link>
+
+        <div className="absolute left-4 top-4">
+          <span className="muted-chip !bg-white/95 !text-[#885e4a]">{productCategory}</span>
         </div>
 
-        {/* ================= HERO IMAGE ================= */}
-        <div className="relative h-[260px]">
-          {/* Image as cover */}
-          <Link to={productLink} className="block h-full">
-            <img
-              src={data?.images?.[0]?.url}
-              alt={data?.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-            />
-          </Link>
-
-          {/* Soft overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-
-          {/* Wishlist pill (top-left) */}
+        <div className="absolute right-4 top-4">
           <button
             type="button"
-            onClick={() => (click ? removeFromWishlistHandler(data) : addToWishlistHandler(data))}
-            className="
-              absolute top-4 left-4
-              inline-flex items-center gap-2
-              px-3 py-2 rounded-full
-              bg-white/85 backdrop-blur
-              border border-white/40
-              shadow-sm
-              hover:bg-white
-              transition
-              text-sm font-semibold text-gray-800
-            "
+            onClick={handleWishlist}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e6ddd2] bg-white/95 text-[#1f2937]"
           >
-            {click ? <AiFillHeart size={18} color="#e11d48" /> : <AiOutlineHeart size={18} />}
-            <span className="hidden sm:block">{click ? "Saved" : "Save"}</span>
+            {isWishlisted ? <AiFillHeart size={18} color="#9b6b53" /> : <AiOutlineHeart size={18} />}
           </button>
-
-          {/* Discount badge (top-right) */}
-          {discountPercent ? (
-            <div className="absolute top-4 right-4">
-              <span className="px-3 py-2 rounded-full text-xs font-extrabold text-white bg-gradient-to-r from-pink-500 to-violet-600 shadow">
-                -{discountPercent}%
-              </span>
-            </div>
-          ) : null}
-
-          {/* Hover actions in center */}
-          <div
-            className="
-              absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-              opacity-0 scale-95
-              group-hover:opacity-100 group-hover:scale-100
-              transition duration-300
-              flex gap-3
-            "
-          >
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              className="
-                px-5 py-2.5 rounded-full
-                bg-white/90 backdrop-blur
-                border border-white/40
-                text-gray-900 font-semibold text-sm
-                hover:bg-white
-                shadow
-              "
-            >
-              Quick View
-            </button>
-
-            <button
-              type="button"
-              onClick={() => addToCartHandler(data._id)}
-              className="
-                px-5 py-2.5 rounded-full
-                bg-gradient-to-r from-[#14152b] to-black
-                text-white font-semibold text-sm
-                shadow
-                hover:opacity-95
-              "
-            >
-              Add to Cart
-            </button>
-          </div>
-
-          {/* Bottom chip row */}
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-            <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur border border-white/20">
-              {data?.sold_out || 0} sold
-            </span>
-
-            <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur border border-white/20">
-              In stock: {data?.stock || 0}
-            </span>
-          </div>
         </div>
-
-        {/* ================= CONTENT ================= */}
-        <div className="p-5">
-          {/* Product name */}
-          <Link to={productLink}>
-            <h3 className="text-[15px] md:text-[16px] font-extrabold text-[#14152b] leading-snug line-clamp-2">
-              {data?.name}
-            </h3>
-          </Link>
-
-          {/* Price block (beauty tag style) */}
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <div className="flex items-end gap-2">
-              <span className="text-[18px] font-extrabold text-gray-900">Rs.{finalPrice}</span>
-
-              {showOriginal ? (
-                <span className="text-sm text-gray-400 line-through">Rs.{data?.originalPrice}</span>
-              ) : null}
-            </div>
-
-            <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-gray-50 border border-gray-200 text-gray-700">
-              Beauty Pick ✨
-            </span>
-          </div>
-
-          {/* Signature row (rating + shop) */}
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Ratings rating={data?.ratings} />
-              <span className="text-xs font-semibold text-gray-600">
-                {data?.ratings ? Number(data.ratings).toFixed(1) : ""}
-              </span>
-            </div>
-
-            <Link to={`/shop/preview/${data?.shop?._id}`}>
-              <span className="text-xs font-bold text-[#3d569a] hover:underline">
-                {data?.shop?.name}
-              </span>
-            </Link>
-          </div>
-        </div>
-
-        {open ? <ProductDetailsCard setOpen={setOpen} data={data} /> : null}
       </div>
-    </>
-  )
-}
 
-export default ProductCard
+      <div className="p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#a67861]">{shopName}</p>
+
+        <Link to={productLink}>
+          <h3 className="mt-3 min-h-[56px] text-base font-semibold leading-6 text-[#1f2937]">{data?.name}</h3>
+        </Link>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className={`muted-chip ${hasDiscount ? "!bg-[#efe2d8] !text-[#9b6b53]" : "!bg-[#f6efe7] !text-[#885e4a]"}`}>
+            {hasDiscount ? `${discountPercent}% off` : "Fresh pick"}
+          </span>
+          <span className="muted-chip">{`${data?.stock || 0} in stock`}</span>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between gap-3 text-sm text-[#6b7280]">
+          <div className="flex items-center gap-2">
+            <Ratings rating={data?.ratings} size={16} />
+            <span>{data?.ratings ? Number(data.ratings).toFixed(1) : "New"}</span>
+          </div>
+          <span>{data?.sold_out || 0} sold</span>
+        </div>
+
+        <div className="app-divider mt-5" />
+
+        <div className="mt-4 flex items-end justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold text-[#1f2937]">Rs. {currentPrice}</span>
+            {hasDiscount && <span className="text-sm text-[#9ca3af] line-through">Rs. {originalPrice}</span>}
+          </div>
+
+          {data?.shop?._id ? (
+            <Link to={`/shop/preview/${data.shop._id}`} className="text-sm text-[#6b7280] hover:text-[#1f2937]">
+              Visit shop
+            </Link>
+          ) : (
+            <span className="text-sm text-[#6b7280]">{isEvent ? "Event product" : "Ready to ship"}</span>
+          )}
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <Link to={productLink} className="btn-secondary !w-full">
+            View
+          </Link>
+          <button type="button" onClick={addToCartHandler} className="btn-primary !w-full">
+            Add to cart
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+export default ProductCard;

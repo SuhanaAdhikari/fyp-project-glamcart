@@ -1,190 +1,122 @@
-import React, { useMemo, useState } from "react"
-import { RxCross1 } from "react-icons/rx"
-import { HiOutlineMinus, HiPlus } from "react-icons/hi"
-import { BsCartX } from "react-icons/bs"
-import { FiShoppingBag } from "react-icons/fi"
-import { Link } from "react-router-dom"
-import { useDispatch, useSelector } from "react-redux"
-import { addTocart, removeFromCart } from "../../redux/actions/cart"
-import { toast } from "react-toastify"
+import React, { useMemo, useState } from "react";
+import { BsCartX } from "react-icons/bs";
+import { HiOutlineMinus, HiPlus } from "react-icons/hi";
+import { RxCross1 } from "react-icons/rx";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { addTocart, removeFromCart } from "../../redux/actions/cart";
 
 const Cart = ({ setOpenCart }) => {
-  const { cart } = useSelector((state) => state.cart)
-  const dispatch = useDispatch()
+  const { cart } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
 
   const totalPrice = useMemo(() => {
-    return cart.reduce((acc, item) => acc + item.qty * item.discountPrice, 0)
-  }, [cart])
-
-  const removeFromCartHandler = (data) => dispatch(removeFromCart(data))
-  const quantityChangeHandler = (data) => dispatch(addTocart(data))
+    return (cart || []).reduce((total, item) => total + Number(item.qty || 0) * Number(item.discountPrice || 0), 0);
+  }, [cart]);
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <button
-        aria-label="Close cart"
-        onClick={() => setOpenCart(false)}
-        className="absolute inset-0 bg-black/40 backdrop-blur-md"
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-white/40 bg-white/70 shadow-[0_30px_90px_rgba(0,0,0,0.25)] backdrop-blur-xl">
-        {/* Top Bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/40 bg-white/60 px-6 py-4 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-r from-[#ff5aa5] to-[#7b61ff] text-white flex items-center justify-center shadow-md">
-              <FiShoppingBag size={18} />
-            </div>
-            <div>
-              <h2 className="text-lg font-extrabold text-[#14152b]">Your Bag</h2>
-              <p className="text-xs text-[#6b6f86]">
-                {cart?.length || 0} item{cart?.length === 1 ? "" : "s"} • Beauty checkout experience ✨
-              </p>
-            </div>
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 p-4">
+      <div className="surface-card relative max-h-[90vh] w-full max-w-5xl overflow-hidden bg-[#f6f2eb]">
+        <div className="flex items-center justify-between border-b border-[#e6ddd2] bg-white px-6 py-4">
+          <div>
+            <h2 className="text-xl font-semibold text-[#1f2937]">Your cart</h2>
+            <p className="text-sm text-[#6b7280]">{cart?.length || 0} item(s)</p>
           </div>
 
           <button
+            type="button"
             onClick={() => setOpenCart(false)}
-            className="h-10 w-10 rounded-full bg-white/80 border border-white/60 hover:bg-white shadow-sm flex items-center justify-center transition"
-            title="Close"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e6ddd2] bg-white"
           >
-            <RxCross1 className="text-[#14152b]" size={20} />
+            <RxCross1 />
           </button>
         </div>
 
-        {/* Content */}
-        {cart?.length === 0 ? (
-          <div className="p-10 flex flex-col items-center justify-center text-center">
-            <div className="h-20 w-20 rounded-3xl bg-[#f3f4ff] flex items-center justify-center mb-5">
-              <BsCartX size={44} className="text-[#7b61ff]" />
+        {cart?.length ? (
+          <div className="grid gap-6 p-6 lg:grid-cols-[1fr_320px]">
+            <div className="max-h-[65vh] space-y-4 overflow-y-auto pr-1">
+              {cart.map((item) => (
+                <CartItem
+                  key={item._id}
+                  data={item}
+                  onRemove={() => dispatch(removeFromCart(item))}
+                  onUpdate={(nextItem) => dispatch(addTocart(nextItem))}
+                />
+              ))}
             </div>
-            <h3 className="text-2xl font-extrabold text-[#14152b]">Your bag is empty</h3>
-            <p className="text-[#6b6f86] mt-2 max-w-md">
-              Add some products and come back — your favorites deserve a place here.
-            </p>
 
-            <button
-              onClick={() => setOpenCart(false)}
-              className="mt-6 px-6 py-3 rounded-xl bg-gradient-to-r from-[#ff5aa5] to-[#7b61ff] text-white font-semibold shadow-md hover:shadow-lg transition"
-            >
-              Continue Shopping
-            </button>
+            <div className="surface-card-sm h-fit bg-white p-5">
+              <h3 className="text-lg font-semibold text-[#1f2937]">Summary</h3>
+              <div className="mt-4 space-y-3 text-sm text-[#6b7280]">
+                <div className="flex items-center justify-between">
+                  <span>Subtotal</span>
+                  <span className="font-semibold text-[#1f2937]">Rs. {totalPrice.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Shipping</span>
+                  <span>Calculated at checkout</span>
+                </div>
+              </div>
+
+              <div className="app-divider my-4" />
+
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-[#1f2937]">Estimated total</span>
+                <span className="text-xl font-bold text-[#1f2937]">Rs. {totalPrice.toLocaleString()}</span>
+              </div>
+
+              <Link to="/checkout" onClick={() => setOpenCart(false)} className="btn-primary mt-5 !w-full">
+                Proceed to checkout
+              </Link>
+              <button type="button" onClick={() => setOpenCart(false)} className="btn-secondary mt-3 !w-full">
+                Continue shopping
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 p-6">
-            {/* Left: items */}
-            <div className="min-h-[320px]">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-bold text-[#14152b]">Items</h3>
-                <span className="text-xs px-3 py-1 rounded-full bg-white/70 border border-white/50 text-[#6b6f86]">
-                  Swipe / scroll
-                </span>
-              </div>
-
-              <div className="space-y-4 max-h-[55vh] overflow-auto pr-1">
-                {cart.map((item, index) => (
-                  <CartSingle
-                    key={item?._id || index}
-                    data={item}
-                    quantityChangeHandler={quantityChangeHandler}
-                    removeFromCartHandler={removeFromCartHandler}
-                  />
-                ))}
-              </div>
+          <div className="p-10 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#e6ddd2] bg-white text-[#6b7280]">
+              <BsCartX size={28} />
             </div>
-
-            {/* Right: summary */}
-            <div className="lg:sticky lg:top-[90px] h-fit">
-              <div className="rounded-2xl bg-white/70 border border-white/50 shadow-sm p-5">
-                <h3 className="text-base font-extrabold text-[#14152b]">Order Summary</h3>
-
-                <div className="mt-4 space-y-3 text-sm">
-                  <div className="flex justify-between text-[#6b6f86]">
-                    <span>Subtotal</span>
-                    <span className="font-semibold text-[#14152b]">Rs.{totalPrice.toLocaleString()}</span>
-                  </div>
-
-                  <div className="flex justify-between text-[#6b6f86]">
-                    <span>Shipping</span>
-                    <span className="font-semibold text-[#14152b]">Calculated at checkout</span>
-                  </div>
-
-                  <div className="h-px bg-white/70" />
-
-                  <div className="flex justify-between">
-                    <span className="text-[#14152b] font-bold">Estimated Total</span>
-                    <span className="text-[#14152b] font-extrabold text-lg">
-                      Rs.{totalPrice.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                <Link to="/checkout" className="block mt-5">
-                  <button className="w-full py-3 rounded-xl bg-gradient-to-r from-[#14152b] to-[#7b61ff] text-white font-semibold shadow-md hover:shadow-lg transition">
-                    Proceed to Checkout
-                  </button>
-                </Link>
-
-                <button
-                  onClick={() => setOpenCart(false)}
-                  className="w-full mt-3 py-3 rounded-xl border border-white/60 bg-white/60 text-[#14152b] font-semibold hover:bg-white transition"
-                >
-                  Continue Shopping
-                </button>
-
-                <div className="mt-4 text-xs text-[#6b6f86] bg-white/50 border border-white/50 rounded-xl p-3">
-                  Tip: Add more items to enjoy a smoother single checkout ✨
-                </div>
-              </div>
-            </div>
+            <h3 className="mt-5 text-xl font-semibold text-[#1f2937]">Your cart is empty</h3>
+            <p className="mt-3 text-[#6b7280]">Add products to your cart and return here when you are ready to checkout.</p>
+            <button type="button" onClick={() => setOpenCart(false)} className="btn-primary mt-6">
+              Continue shopping
+            </button>
           </div>
         )}
-
-        {/* Bottom safe-area */}
-        <div className="h-2" />
       </div>
     </div>
-  )
-}
+  );
+};
 
-const CartSingle = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
-  const [value, setValue] = useState(data.qty)
+const CartItem = ({ data, onRemove, onUpdate }) => {
+  const [value, setValue] = useState(Number(data?.qty || 1));
 
-  const total = useMemo(() => data.discountPrice * value, [data.discountPrice, value])
+  const total = useMemo(() => Number(data?.discountPrice || 0) * value, [data?.discountPrice, value]);
 
   const increment = () => {
-    if (data.stock < value + 1) {
-      toast.error("Product stock limited!")
-      return
+    if (Number(data?.stock || 0) <= value) {
+      toast.error("Product stock is limited.");
+      return;
     }
-    const next = value + 1
-    setValue(next)
-    quantityChangeHandler({ ...data, qty: next })
-  }
+
+    const nextValue = value + 1;
+    setValue(nextValue);
+    onUpdate({ ...data, qty: nextValue });
+  };
 
   const decrement = () => {
-    const next = value <= 1 ? 1 : value - 1
-    setValue(next)
-    quantityChangeHandler({ ...data, qty: next })
-  }
+    const nextValue = value <= 1 ? 1 : value - 1;
+    setValue(nextValue);
+    onUpdate({ ...data, qty: nextValue });
+  };
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-4 shadow-sm hover:shadow-md transition">
-      {/* decorative gradient corner */}
-      <div className="pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full bg-gradient-to-r from-[#ff5aa5]/40 to-[#7b61ff]/40 blur-2xl" />
-
-      <button
-        onClick={() => removeFromCartHandler(data)}
-        className="absolute right-3 top-3 h-9 w-9 rounded-full bg-white/70 border border-white/60 hover:bg-white flex items-center justify-center transition"
-        title="Remove"
-      >
-        <RxCross1 size={18} className="text-[#14152b]" />
-      </button>
-
+    <div className="surface-card-sm bg-white p-4">
       <div className="flex gap-4">
-        {/* Image */}
-        <div className="h-20 w-20 rounded-2xl overflow-hidden border border-white/60 bg-white">
+        <div className="h-20 w-20 overflow-hidden rounded-2xl border border-[#e6ddd2] bg-[#fbf8f3]">
           <img
             src={data?.images?.[0]?.url || "/placeholder.svg"}
             alt={data?.name || "Product"}
@@ -192,43 +124,39 @@ const CartSingle = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
           />
         </div>
 
-        {/* Info */}
         <div className="flex-1">
-          <h4 className="font-bold text-[#14152b] leading-snug line-clamp-1">{data?.name}</h4>
-          <p className="text-xs text-[#6b6f86] mt-1">
-            Rs.{data.discountPrice.toLocaleString()} • In stock: {data.stock}
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h4 className="font-semibold text-[#1f2937]">{data?.name}</h4>
+              <p className="mt-1 text-sm text-[#6b7280]">Rs. {Number(data?.discountPrice || 0).toLocaleString()}</p>
+            </div>
 
-          <div className="mt-3 flex items-center justify-between gap-3">
-            {/* Qty */}
-            <div className="flex items-center rounded-xl border border-white/60 bg-white/60 overflow-hidden">
-              <button
-                onClick={decrement}
-                className="h-10 w-10 flex items-center justify-center hover:bg-white transition"
-              >
-                <HiOutlineMinus className="text-[#14152b]" />
+            <button
+              type="button"
+              onClick={onRemove}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e6ddd2] bg-white"
+            >
+              <RxCross1 size={16} />
+            </button>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <div className="flex items-center overflow-hidden rounded-full border border-[#e6ddd2]">
+              <button type="button" onClick={decrement} className="flex h-10 w-10 items-center justify-center bg-white">
+                <HiOutlineMinus />
               </button>
-              <div className="min-w-[40px] text-center font-bold text-[#14152b]">{value}</div>
-              <button
-                onClick={increment}
-                className="h-10 w-10 flex items-center justify-center hover:bg-white transition"
-              >
-                <HiPlus className="text-[#14152b]" />
+              <span className="min-w-[44px] text-center font-semibold text-[#1f2937]">{value}</span>
+              <button type="button" onClick={increment} className="flex h-10 w-10 items-center justify-center bg-white">
+                <HiPlus />
               </button>
             </div>
 
-            {/* Price */}
-            <div className="text-right">
-              <p className="text-xs text-[#6b6f86]">Total</p>
-              <p className="text-lg font-extrabold text-[#14152b]">
-                Rs.{total.toLocaleString()}
-              </p>
-            </div>
+            <p className="font-semibold text-[#1f2937]">Rs. {total.toLocaleString()}</p>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Cart
+export default Cart;

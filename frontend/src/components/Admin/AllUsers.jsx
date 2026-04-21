@@ -82,11 +82,8 @@ const AllUsers = () => {
       flex: 0.7,
       renderCell: (params) => {
         const v = (params.value || "user").toLowerCase()
-        const cls =
-          v === "admin"
-            ? "bg-black text-white ring-1 ring-black"
-            : "bg-gray-100 text-gray-700 ring-1 ring-gray-200"
-        return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${cls}`}>{v}</span>
+        const cls = v === "admin" ? "status-chip status-chip--strong" : "status-chip status-chip--neutral"
+        return <span className={cls}>{v}</span>
       },
     },
 
@@ -112,9 +109,9 @@ const AllUsers = () => {
           }}
           title="Delete User"
           type="button"
-          className="h-10 w-10 rounded-xl hover:bg-rose-50 flex items-center justify-center transition"
+          className="btn-danger !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
         >
-          <AiOutlineDelete size={20} className="text-rose-600" />
+          <AiOutlineDelete size={20} />
         </button>
       ),
     },
@@ -142,17 +139,17 @@ const AllUsers = () => {
       ) : (
         <div className="w-full p-4 md:p-6">
           {/* GlamCart Header */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm mb-5">
+          <div className="surface-card mb-5">
             <div className="px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="text-[22px] md:text-[26px] font-semibold text-gray-900">All Users</h2>
-                <p className="text-sm text-gray-500 mt-1">Manage users and roles.</p>
+                <h2 className="text-[22px] md:text-[26px] font-semibold text-[var(--color-text)]">All Users</h2>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">Manage users and roles.</p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                  <span className="status-chip status-chip--neutral">
                     Total: {total}
                   </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-gray-700 ring-1 ring-gray-200">
+                  <span className="status-chip status-chip--muted">
                     Showing: {shown}
                   </span>
                 </div>
@@ -160,13 +157,13 @@ const AllUsers = () => {
 
               {/* Search */}
               <div className="w-full md:w-[420px]">
-                <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 h-12">
-                  <FiSearch className="text-gray-500" />
+                <div className="flex items-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 h-12">
+                  <FiSearch className="text-[var(--color-muted)]" />
                   <input
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="Search by name, email, role, id..."
-                    className="w-full outline-none bg-transparent text-sm text-gray-900 placeholder:text-gray-400"
+                    className="w-full outline-none bg-transparent text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)]"
                   />
                 </div>
               </div>
@@ -174,16 +171,16 @@ const AllUsers = () => {
           </div>
 
           {/* Table */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="surface-card overflow-hidden">
             <div className="px-5 py-4 md:px-6 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">User List</h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <h3 className="text-lg font-semibold text-[var(--color-text)]">User List</h3>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">
                   Showing {shown} of {total}
                 </p>
               </div>
 
-              <div className="hidden md:flex items-center gap-2 text-gray-600 text-sm">
+              <div className="hidden md:flex items-center gap-2 text-[var(--color-muted)] text-sm">
                 <FiUsers />
                 <span>All accounts</span>
               </div>
@@ -192,14 +189,14 @@ const AllUsers = () => {
             <div className="px-2 md:px-4 pb-4">
               {rows.length === 0 ? (
                 <div className="py-14 text-center">
-                  <div className="mx-auto h-14 w-14 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-900">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] text-[var(--color-accent-strong)]">
                     <FiUsers size={24} />
                   </div>
-                  <h4 className="mt-4 text-lg font-semibold text-gray-900">No users found</h4>
-                  <p className="mt-2 text-sm text-gray-500">{q ? `No users matching "${q}".` : "No users available."}</p>
+                  <h4 className="mt-4 text-lg font-semibold text-[var(--color-text)]">No users found</h4>
+                  <p className="mt-2 text-sm text-[var(--color-muted)]">{q ? `No users matching "${q}".` : "No users available."}</p>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="surface-card-sm overflow-hidden bg-white">
                   <DataGrid
                     rows={rows}
                     columns={columns}
@@ -217,38 +214,38 @@ const AllUsers = () => {
           {/* Delete Modal */}
           {open && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[999] p-4">
-              <div className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-2xl p-6">
+              <div className="surface-card w-full max-w-md p-6">
                 <div className="w-full flex justify-end">
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition"
+                    className="btn-secondary !h-10 !min-h-0 !w-10 !rounded-[14px] !p-0"
                     title="Close"
                   >
-                    <RxCross1 size={18} className="text-gray-700" />
+                    <RxCross1 size={18} className="text-[var(--color-text)]" />
                   </button>
                 </div>
 
                 <div className="flex flex-col items-center justify-center text-center">
-                  <div className="h-14 w-14 rounded-2xl bg-rose-50 flex items-center justify-center">
-                    <FiAlertTriangle size={24} className="text-rose-600" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#dcc0b4] bg-[#f3e2dc] text-[#8d4e3c]">
+                    <FiAlertTriangle size={24} />
                   </div>
-                  <h3 className="mt-4 text-xl font-semibold text-gray-900">Delete user?</h3>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <h3 className="mt-4 text-xl font-semibold text-[var(--color-text)]">Delete user?</h3>
+                  <p className="mt-2 text-sm text-[var(--color-muted)]">
                     This action cannot be undone. The user will be removed permanently.
                   </p>
                 </div>
 
                 <div className="mt-6 flex gap-3">
                   <button
-                    className="flex-1 h-11 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-sm font-semibold transition"
+                    className="btn-secondary !h-11 !w-full"
                     onClick={() => setOpen(false)}
                     type="button"
                   >
                     Cancel
                   </button>
                   <button
-                    className="flex-1 h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold transition"
+                    className="btn-danger !h-11 !w-full"
                     onClick={() => {
                       setOpen(false)
                       handleDelete(userId)

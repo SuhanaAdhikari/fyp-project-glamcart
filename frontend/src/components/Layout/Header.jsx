@@ -1,263 +1,277 @@
-import React, { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-// import logo from "../../Assests/logo.png"
-import { shoeCategoriesData } from "../../static/data"
-import { AiOutlineSearch, AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai"
-import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io"
-import { CgProfile } from "react-icons/cg"
-import { BiMenuAltLeft } from "react-icons/bi"
-import DropDown from "./DropDown"
-import Navbar from "./Navbar"
-import { useSelector } from "react-redux"
-import Cart from "../cart/Cart"
-import Wishlist from "../Wishlist/Wishlist"
-import { RxCross1 } from "react-icons/rx"
-import { FiLogIn } from "react-icons/fi"
-import { FaUserPlus } from "react-icons/fa"
+import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { AiOutlineHeart, AiOutlineSearch, AiOutlineShoppingCart } from "react-icons/ai";
+import { BiMenuAltLeft } from "react-icons/bi";
+import { CgProfile } from "react-icons/cg";
+import { FiLogIn, FiUserPlus } from "react-icons/fi";
+import { IoIosArrowDown } from "react-icons/io";
+import { RxCross1 } from "react-icons/rx";
+import { shoeCategoriesData } from "../../static/data";
+import Cart from "../cart/Cart";
+import Wishlist from "../Wishlist/Wishlist";
+import DropDown from "./DropDown";
+import Navbar from "./Navbar";
 
-const BRAND = {
-  name: "GlamCart ",
-  primary: "#c084fc", // glam lavender
-  dark: "#1f1b2e",
-  accent: "#f472b6", // glam pink
-}
+const Header = ({ activeHeading = 1 }) => {
+  const { isAuthenticated, user } = useSelector((state) => state.user);
+  const { isSeller } = useSelector((state) => state.seller);
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
+  const { allProducts } = useSelector((state) => state.products);
 
-const Header = ({ activeHeading }) => {
-  const { isAuthenticated, user } = useSelector((state) => state.user)
-  const { isSeller } = useSelector((state) => state.seller)
-  const { wishlist } = useSelector((state) => state.wishlist)
-  const { cart } = useSelector((state) => state.cart)
-  const { allProducts } = useSelector((state) => state.products)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dropDown, setDropDown] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+  const [openWishlist, setOpenWishlist] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [searchData, setSearchData] = useState([])
-  const [dropDown, setDropDown] = useState(false)
-  const [isSticky, setIsSticky] = useState(false)
-  const [openCart, setOpenCart] = useState(false)
-  const [openWishlist, setOpenWishlist] = useState(false)
-  const [open, setOpen] = useState(false)
+  const sellerLink = isSeller ? "/dashboard" : "/shop-create";
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value
-    setSearchTerm(value)
+  const searchResults = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return [];
 
-    const safeProducts = Array.isArray(allProducts) ? allProducts : []
-    setSearchData(
-      value.trim()
-        ? safeProducts.filter((p) => (p?.name || "").toLowerCase().includes(value.toLowerCase()))
-        : [],
-    )
-  }
+    const safeProducts = Array.isArray(allProducts) ? allProducts : [];
 
-  useEffect(() => {
-    const handleScroll = () => setIsSticky(window.scrollY > 70)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    return safeProducts
+      .filter((product) => (product?.name || "").toLowerCase().includes(query))
+      .slice(0, 6);
+  }, [allProducts, searchTerm]);
 
-  const handleProductClick = () => {
-    setSearchTerm("")
-    setSearchData([])
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+  const closeMenu = () => setOpenMenu(false);
+
+  const handleResultClick = () => {
+    setSearchTerm("");
+    setDropDown(false);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <>
-      {/* Desktop Top Header */}
-      <div className="hidden 800px:flex items-center justify-between py-4 px-6 shadow-sm bg-white z-40 relative border-b border-gray-100">
-        <Link to="/" className="flex items-center gap-2">
-          {/* <img src={logo} alt={BRAND.name} className="w-[48px] h-[48px] object-contain" /> */}
-          <span className="text-2xl font-extrabold tracking-wide text-[#1f1b2e]">
-            GlamCart 
-          </span>
-        </Link>
+      <header className="sticky top-0 z-50 border-b border-[#dfd2c4] bg-[#f2ece4]/92 backdrop-blur">
+        <div className="section-shell">
+          <div className="hidden items-center gap-6 py-4 800px:flex">
+            <Link to="/" className="shrink-0">
+              <div className="rounded-[22px] border border-[#dfd2c4] bg-white px-4 py-3 shadow-[0_12px_28px_rgba(23,33,43,0.06)]">
+                <p className="text-2xl font-extrabold tracking-tight text-[#17212b]">GlamCart</p>
+                <p className="text-xs uppercase tracking-[0.18em] text-[#885e4a]">Beauty and lifestyle store</p>
+              </div>
+            </Link>
 
-        {/* Search */}
-        <div className="relative flex-grow max-w-[720px] mx-6 z-50">
-          <input
-            type="text"
-            placeholder="Search beauty, skincare & glam essentials..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="h-[44px] w-full px-4 pr-10 border border-gray-200 rounded-xl outline-none focus:border-[#c084fc] focus:ring-2 focus:ring-[#c084fc]/20 transition bg-white shadow-sm"
-          />
-          <AiOutlineSearch className="absolute right-3 top-[11px] text-gray-500 cursor-pointer text-xl hover:text-[#c084fc] transition" />
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search products"
+                className="field-input pr-11 !min-h-[56px] !rounded-[20px] bg-white"
+              />
+              <AiOutlineSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-xl text-[#687280]" />
 
-          {searchData.length > 0 && (
-            <div className="absolute top-[115%] left-0 w-full bg-white shadow-2xl rounded-xl p-2 z-50 border border-gray-100 max-h-[500px] overflow-y-auto">
-              {searchData.map((product, index) => (
-                <Link to={`/product/${product._id}`} key={product?._id || index} onClick={handleProductClick}>
-                  <div className="flex items-center p-2 hover:bg-[#faf5ff] rounded-lg transition">
-                    <img
-                      src={product?.images?.[0]?.url || "/placeholder.svg"}
-                      alt={product?.name || "Product"}
-                      className="w-[44px] h-[44px] mr-3 rounded-lg object-cover border border-gray-100"
-                    />
-                    <div className="flex flex-col">
-                      <h1 className="text-sm font-semibold text-[#1f1b2e]">{product?.name}</h1>
-                      <p className="text-xs text-gray-500">Tap to view</p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+              {searchResults.length > 0 && (
+                <div className="surface-card absolute left-0 top-[calc(100%+12px)] z-50 w-full overflow-hidden !rounded-[24px]">
+                  {searchResults.map((product) => (
+                    <Link
+                      key={product._id}
+                      to={`/product/${product._id}`}
+                      onClick={handleResultClick}
+                      className="flex items-center gap-3 border-b border-[#dfd2c4] px-4 py-3 last:border-b-0 hover:bg-[#faf5ef]"
+                    >
+                      <div className="h-12 w-12 overflow-hidden rounded-2xl border border-[#dfd2c4] bg-[#faf5ef]">
+                        <img
+                          src={product?.images?.[0]?.url || "/placeholder.svg"}
+                          alt={product?.name || "Product"}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-[#1f2937]">{product?.name}</p>
+                        <p className="text-xs text-[#6b7280]">Open product details</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Seller CTA */}
-        <Link to={isSeller ? "/dashboard" : "/shop-create"}>
-          <button className="bg-gradient-to-r from-[#c084fc] to-[#f472b6] text-white px-5 py-2.5 rounded-xl flex items-center font-semibold shadow-md hover:shadow-lg transition-transform transform hover:scale-[1.03]">
-            {isSeller ? "Seller Dashboard" : "Sell on GlamCart"}
-            <IoIosArrowForward className="ml-1 text-lg" />
-          </button>
-        </Link>
-      </div>
+            <div className="flex items-center gap-3">
+              <Link to={sellerLink} className="btn-primary !min-h-[48px] !px-5">
+                {isSeller ? "Seller dashboard" : "Start selling"}
+              </Link>
 
-      {/* Sticky Navbar (Desktop) */}
-      <div
-        className={`w-full h-[72px] px-4 flex items-center transition-all duration-300 border-b border-white/10 bg-gradient-to-r from-[#1f1b2e] to-[#2d1f47] ${
-          isSticky ? "fixed top-0 left-0 shadow-2xl z-50" : "relative"
-        } 800px:flex hidden`}
-      >
-        <div className="relative flex items-center justify-between w-full max-w-[1200px] mx-auto">
-          {/* Categories */}
-          <div className="relative flex-shrink-0">
-            <button
-              className="flex items-center w-[220px] h-[50px] bg-white text-[#1f1b2e] text-[15px] font-semibold rounded-xl px-4 shadow-lg hover:bg-[#fff7ff] transition"
-              onClick={() => setDropDown(!dropDown)}
-            >
-              <BiMenuAltLeft size={24} className="mr-2 text-[#c084fc]" />
-              Beauty Categories
-              <IoIosArrowDown size={20} className="ml-auto text-[#c084fc]" />
-            </button>
-            {dropDown && <DropDown categoriesData={shoeCategoriesData} setDropDown={setDropDown} />}
+              <button
+                type="button"
+                onClick={() => setOpenWishlist(true)}
+                className="relative flex h-12 w-12 items-center justify-center rounded-full border border-[#dfd2c4] bg-white text-[#17212b]"
+              >
+                <AiOutlineHeart size={22} />
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#1f2937] text-[11px] font-semibold text-white">
+                  {wishlist?.length || 0}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOpenCart(true)}
+                className="relative flex h-12 w-12 items-center justify-center rounded-full border border-[#dfd2c4] bg-white text-[#17212b]"
+              >
+                <AiOutlineShoppingCart size={22} />
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#1f2937] text-[11px] font-semibold text-white">
+                  {cart?.length || 0}
+                </span>
+              </button>
+
+              {isAuthenticated ? (
+                <Link to="/profile" className="overflow-hidden rounded-full border border-[#dfd2c4] bg-white shadow-[0_8px_18px_rgba(23,33,43,0.06)]">
+                  <img
+                    src={user?.avatar?.url || "/placeholder.svg"}
+                    alt="User"
+                    className="h-12 w-12 object-cover"
+                  />
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dfd2c4] bg-white text-[#17212b]"
+                >
+                  <CgProfile size={22} />
+                </Link>
+              )}
+            </div>
           </div>
 
-          {/* Nav links */}
-          <div className="flex space-x-6 text-white">
+          <div className="hidden items-center justify-between gap-4 py-3 800px:flex">
+            <div className="surface-card-sm flex w-full items-center justify-between gap-4 bg-white px-4 py-3">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setDropDown((value) => !value)}
+                className="btn-secondary !min-h-[46px] !rounded-[16px] !px-5"
+              >
+                Browse categories
+                <IoIosArrowDown />
+              </button>
+
+              {dropDown && <DropDown categoriesData={shoeCategoriesData} setDropDown={setDropDown} />}
+            </div>
+
             <Navbar active={activeHeading} />
+            </div>
           </div>
 
-          {/* Icons */}
-          <div className="flex space-x-6 items-center">
-            <button type="button" className="relative group" onClick={() => setOpenWishlist(true)}>
-              <AiOutlineHeart size={30} className="text-white hover:text-[#f472b6] transition" />
-              <span className="absolute -top-2 -right-2 bg-white rounded-full w-5 h-5 text-[#1f1b2e] text-xs flex items-center justify-center font-bold">
-                {wishlist?.length || 0}
-              </span>
+          <div className="flex items-center justify-between py-3 800px:hidden">
+            <button
+              type="button"
+              onClick={() => setOpenMenu(true)}
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-[#dfd2c4] bg-white text-[#17212b]"
+            >
+              <BiMenuAltLeft size={24} />
             </button>
 
-            <button type="button" className="relative group" onClick={() => setOpenCart(true)}>
-              <AiOutlineShoppingCart size={30} className="text-white hover:text-[#f472b6] transition" />
-              <span className="absolute -top-2 -right-2 bg-white rounded-full w-5 h-5 text-[#1f1b2e] text-xs flex items-center justify-center font-bold">
+            <Link to="/" className="rounded-full border border-[#dfd2c4] bg-white px-4 py-2 text-lg font-extrabold tracking-tight text-[#17212b] shadow-[0_10px_22px_rgba(23,33,43,0.05)]">
+              GlamCart
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setOpenCart(true)}
+              className="relative flex h-12 w-12 items-center justify-center rounded-full border border-[#dfd2c4] bg-white text-[#17212b]"
+            >
+              <AiOutlineShoppingCart size={22} />
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#1f2937] text-[11px] font-semibold text-white">
                 {cart?.length || 0}
               </span>
             </button>
-
-            {isAuthenticated ? (
-              <Link to="/profile" className="group relative">
-                <img
-                  src={user?.avatar?.url || "/placeholder.svg"}
-                  alt="User Avatar"
-                  className="w-10 h-10 rounded-full border-2 border-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:border-[#f472b6]"
-                />
-              </Link>
-            ) : (
-              <Link to="/login" className="flex items-center">
-                <CgProfile size={30} className="text-white hover:text-[#f472b6] transition" />
-              </Link>
-            )}
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Mobile Header */}
-      <div className="w-full 800px:hidden fixed bg-white z-50 top-0 left-0 shadow-md border-b border-gray-100">
-        <div className="w-full flex items-center justify-between px-4 py-2">
-          <BiMenuAltLeft size={30} onClick={() => setOpen(true)} className="text-[#1f1b2e]" />
+      {openMenu && (
+        <div className="fixed inset-0 z-[999] bg-black/30 p-4 800px:hidden">
+          <div className="ml-auto h-full w-full max-w-[340px] overflow-y-auto rounded-[28px] border border-[#dfd2c4] bg-[#f2ece4] p-5 shadow-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-xl font-extrabold text-[#1f2937]">Menu</span>
+              <button
+                type="button"
+                onClick={closeMenu}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#dfd2c4] bg-white"
+              >
+                <RxCross1 />
+              </button>
+            </div>
 
-          <Link to="/" className="flex items-center gap-2">
-            <img  alt={BRAND.name} className="h-[44px]" />
-            <span className="font-extrabold text-lg text-[#1f1b2e]">
-              GlamCart <span className="text-[#c084fc]">US</span>
-            </span>
-          </Link>
+            <div className="mt-5">
+              <Navbar active={activeHeading} vertical onNavigate={closeMenu} />
+            </div>
 
-          <button
-            type="button"
-            className="relative group flex items-center justify-center w-10 h-10"
-            onClick={() => setOpenCart(true)}
-          >
-            <AiOutlineShoppingCart size={28} className="text-[#1f1b2e] hover:text-[#c084fc] transition" />
-            <span className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-[#c084fc] to-[#f472b6] rounded-full w-5 h-5 text-white text-[10px] flex items-center justify-center font-bold">
-              {cart?.length || 0}
-            </span>
-          </button>
-        </div>
-
-        {/* Sidebar */}
-        {open && (
-          <div className="fixed w-full bg-black bg-opacity-40 z-40 h-full top-0 left-0">
-            <div className="fixed w-[70%] bg-white h-full top-0 left-0 z-50 overflow-y-auto">
-              <div className="flex justify-between items-center p-4 border-b border-gray-200">
-                <div className="flex items-center gap-2">
-                  <AiOutlineHeart size={26} className="text-[#f472b6]" />
-                  <span className="font-extrabold text-base text-[#1f1b2e]">
-                    GlamCart <span className="text-[#c084fc]">US</span>
-                  </span>
-                </div>
-                <RxCross1 size={26} onClick={() => setOpen(false)} className="text-[#1f1b2e]" />
-              </div>
-
-              <div className="px-3">
-                <Navbar active={activeHeading} />
-              </div>
-
-              <div className="px-6 mt-4">
-                <Link to={isSeller ? "/dashboard" : "/shop-create"} onClick={() => setOpen(false)}>
-                  <button className="w-full bg-gradient-to-r from-[#c084fc] to-[#f472b6] text-white px-5 py-3 rounded-xl flex items-center justify-center font-semibold hover:shadow-lg transition">
-                    {isSeller ? "Seller Dashboard" : "Start Selling on GlamCart"}
-                    <IoIosArrowForward className="ml-1 text-lg" />
-                  </button>
-                </Link>
-              </div>
-
-              <div className="flex w-full justify-center mt-6 pb-10">
-                {isAuthenticated ? (
-                  <Link to="/profile" onClick={() => setOpen(false)}>
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-[3px] border-[#c084fc] shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer">
-                      <img
-                        src={user?.avatar?.url || "/placeholder.svg"}
-                        alt="User Avatar"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+            <div className="mt-6 space-y-3">
+              <p className="text-sm font-semibold text-[#1f2937]">Popular categories</p>
+              <div className="flex flex-wrap gap-2">
+                {shoeCategoriesData.slice(0, 6).map((item) => (
+                  <Link
+                    key={item.id}
+                    to={`/products?category=${encodeURIComponent(item.title)}`}
+                    onClick={closeMenu}
+                    className="muted-chip"
+                  >
+                    {item.title}
                   </Link>
-                ) : (
-                  <div className="flex flex-col gap-3 px-6 w-full">
-                    <Link to="/login" onClick={() => setOpen(false)}>
-                      <button className="w-full bg-[#1f1b2e] text-white px-6 py-3 rounded-xl flex items-center justify-center font-semibold hover:bg-black transition shadow">
-                        <FiLogIn className="mr-2 text-[18px]" /> Login
-                      </button>
-                    </Link>
-                    <Link to="/signup" onClick={() => setOpen(false)}>
-                      <button className="w-full bg-gradient-to-r from-[#c084fc] to-[#f472b6] text-white px-6 py-3 rounded-xl flex items-center justify-center font-semibold hover:shadow-lg transition shadow">
-                        <FaUserPlus className="mr-2 text-[18px]" /> Sign Up
-                      </button>
-                    </Link>
-                  </div>
-                )}
+                ))}
               </div>
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* Modals */}
+            <div className="mt-6 grid gap-3">
+              <Link to={sellerLink} onClick={closeMenu} className="btn-secondary !w-full">
+                {isSeller ? "Seller dashboard" : "Start selling"}
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  closeMenu();
+                  setOpenWishlist(true);
+                }}
+                className="btn-secondary !w-full"
+              >
+                <AiOutlineHeart />
+                Wishlist ({wishlist?.length || 0})
+              </button>
+            </div>
+
+            <div className="mt-6 border-t border-[#dfd2c4] pt-6">
+              {isAuthenticated ? (
+                <Link to="/profile" onClick={closeMenu} className="flex items-center gap-3">
+                  <img
+                    src={user?.avatar?.url || "/placeholder.svg"}
+                    alt="User"
+                    className="h-12 w-12 rounded-full border border-[#dfd2c4] object-cover"
+                  />
+                  <div>
+                    <p className="font-semibold text-[#1f2937]">{user?.name || "My account"}</p>
+                    <p className="text-sm text-[#6b7280]">Open profile</p>
+                  </div>
+                </Link>
+              ) : (
+                <div className="grid gap-3">
+                  <Link to="/login" onClick={closeMenu} className="btn-primary !w-full">
+                    <FiLogIn />
+                    Login
+                  </Link>
+                  <Link to="/sign-up" onClick={closeMenu} className="btn-secondary !w-full">
+                    <FiUserPlus />
+                    Create account
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {openCart && <Cart setOpenCart={setOpenCart} />}
       {openWishlist && <Wishlist setOpenWishlist={setOpenWishlist} />}
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

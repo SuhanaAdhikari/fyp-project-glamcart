@@ -51,7 +51,7 @@ const AllProducts = () => {
       minWidth: 180,
       flex: 1.4,
       renderCell: (params) => {
-        return <div className="font-medium text-[#1a2240]">{params.value}</div>
+        return <div className="font-medium text-[var(--color-text)]">{params.value}</div>
       },
     },
     {
@@ -60,7 +60,7 @@ const AllProducts = () => {
       minWidth: 100,
       flex: 0.6,
       renderCell: (params) => {
-        return <div className="font-semibold text-[#3d569a]">{params.value}</div>
+        return <div className="font-semibold text-[var(--color-accent-strong)]">{params.value}</div>
       },
     },
     {
@@ -70,8 +70,11 @@ const AllProducts = () => {
       minWidth: 80,
       flex: 0.5,
       renderCell: (params) => {
+        const stock = Number(params.value || 0)
         return (
-          <div className={`font-medium ${params.value < 10 ? "text-red-500" : "text-green-600"}`}>{params.value}</div>
+          <div className={stock < 10 ? "status-chip status-chip--danger" : "status-chip status-chip--success"}>
+            {stock}
+          </div>
         )
       },
     },
@@ -82,7 +85,7 @@ const AllProducts = () => {
       minWidth: 130,
       flex: 0.6,
       renderCell: (params) => {
-        return <div className="font-medium text-[#334580]">{params.value}</div>
+        return <div className="font-medium text-[var(--color-muted)]">{params.value}</div>
       },
     },
     {
@@ -94,8 +97,8 @@ const AllProducts = () => {
       renderCell: (params) => {
         return (
           <Link to={`/product/${params.id}`}>
-            <Button className="!p-2 !min-w-[40px] !rounded-full hover:!bg-[#f0f4fa]">
-              <AiOutlineEye size={20} className="text-[#3d569a]" />
+            <Button className="!p-2 !min-w-[40px] !rounded-full hover:!bg-[var(--color-surface-soft)]">
+              <AiOutlineEye size={20} className="text-[var(--color-accent-strong)]" />
             </Button>
           </Link>
         )
@@ -111,9 +114,9 @@ const AllProducts = () => {
         return (
           <Button
             onClick={() => handleDelete(params.id)}
-            className="!p-2 !min-w-[40px] !rounded-full hover:!bg-[#fff3f3]"
+            className="!p-2 !min-w-[40px] !rounded-full hover:!bg-[var(--color-accent-soft)]"
           >
-            <AiOutlineDelete size={20} className="text-red-500" />
+            <AiOutlineDelete size={20} className="text-[var(--color-accent-strong)]" />
           </Button>
         )
       },
@@ -139,8 +142,8 @@ const AllProducts = () => {
         <Loader />
       ) : (
         <div className="w-full px-8 pt-6 mt-6">
-          <h2 className="text-2xl font-bold text-[#1a2240] mb-6">All Products</h2>
-          <div className="bg-white rounded-xl shadow-md border border-[#dce5f3] overflow-hidden">
+          <h2 className="text-2xl font-bold text-[var(--color-text)] mb-6">All Products</h2>
+          <div className="surface-card overflow-hidden">
             <DataGrid
               rows={row}
               columns={columns}
@@ -156,12 +159,12 @@ const AllProducts = () => {
               border: none !important;
             }
             .MuiDataGrid-columnHeaders {
-              background-color: #f0f4fa;
-              color: #1a2240;
+              background-color: var(--color-surface-soft);
+              color: var(--color-text);
               font-weight: 600;
             }
             .MuiDataGrid-footerContainer {
-              background-color: #f0f4fa;
+              background-color: var(--color-surface-soft);
               border-top: none;
             }
             .MuiDataGrid-cell:focus,
@@ -169,7 +172,7 @@ const AllProducts = () => {
               outline: none !important;
             }
             .MuiDataGrid-row:hover {
-              background-color: #f0f4fa !important;
+              background-color: var(--color-surface-soft) !important;
             }
           `}</style>
         </div>

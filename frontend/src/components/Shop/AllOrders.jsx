@@ -126,7 +126,10 @@ const AllOrders = () => {
           {/* Header */}
           <div className="mb-6 flex flex-col gap-2">
             <div className="inline-flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-gradient-to-r from-pink-500 to-violet-600" />
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ background: "linear-gradient(90deg, var(--color-accent), var(--color-accent-strong))" }}
+              />
               <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">Orders</p>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">All Orders</h2>
@@ -135,7 +138,10 @@ const AllOrders = () => {
 
           {/* Table Container */}
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-            <div className="h-[5px] w-full bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600" />
+            <div
+              className="h-[5px] w-full"
+              style={{ background: "linear-gradient(90deg, var(--color-accent), var(--color-accent-strong))" }}
+            />
             <div className="p-2 md:p-4">
               <DataGrid
                 rows={rows}
@@ -154,8 +160,8 @@ const AllOrders = () => {
               width: 10px;
               height: 10px;
               border-radius: 999px;
-              background: linear-gradient(90deg, #ec4899, #a855f7);
-              box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
+              background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+              box-shadow: 0 0 0 3px rgba(166, 120, 97, 0.12);
               display: inline-block;
             }
 

@@ -28,7 +28,6 @@ const ProductDetails = ({ data }) => {
   const [click, setClick] = useState(false)
   const [select, setSelect] = useState(0)
 
-  // fetch shop products + wishlist sync
   useEffect(() => {
     if (data?.shop?._id) {
       dispatch(getAllProductsShop(data.shop._id))
@@ -37,11 +36,10 @@ const ProductDetails = ({ data }) => {
 
   useEffect(() => {
     if (!data?._id) return
-    const exists = wishlist?.some((i) => i?._id === data._id)
+    const exists = wishlist?.some((item) => item?._id === data._id)
     setClick(Boolean(exists))
   }, [wishlist, data?._id])
 
-  // reset count + selected image when product changes
   useEffect(() => {
     setCount(1)
     setSelect(0)
@@ -70,13 +68,11 @@ const ProductDetails = ({ data }) => {
   const addToCartHandler = () => {
     if (!data?._id) return
 
-    const isItemExists = cart?.some((i) => i?._id === data._id)
+    const isItemExists = cart?.some((item) => item?._id === data._id)
     if (isItemExists) return toast.error("Item already in cart!")
-
     if (Number(data?.stock || 0) < 1) return toast.error("Product out of stock!")
 
-    const cartData = { ...data, qty: count }
-    dispatch(addTocart(cartData))
+    dispatch(addTocart({ ...data, qty: count }))
     toast.success("Item added to cart!")
   }
 
@@ -91,7 +87,7 @@ const ProductDetails = ({ data }) => {
 
   const totalRatings = useMemo(() => {
     return (products || []).reduce((acc, product) => {
-      const sum = (product?.reviews || []).reduce((s, r) => s + (Number(r?.rating) || 0), 0)
+      const sum = (product?.reviews || []).reduce((score, review) => score + (Number(review?.rating) || 0), 0)
       return acc + sum
     }, 0)
   }, [products])
@@ -121,105 +117,94 @@ const ProductDetails = ({ data }) => {
   if (!data) return null
 
   return (
-    <div className="bg-white">
+    <div className="page-shell">
       <div className={`${styles.section} w-[92%] 800px:w-[80%]`}>
         <div className="w-full py-6">
-          <div className="grid grid-cols-1 800px:grid-cols-2 gap-8">
-            {/* Images */}
+          <div className="grid grid-cols-1 gap-8 800px:grid-cols-2">
             <div className="w-full">
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4">
-                <div className="bg-gray-50 rounded-xl p-4">
+              <div className="surface-card p-4">
+                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] p-4">
                   <img
                     src={data?.images?.[select]?.url}
                     alt={data?.name}
-                    className="w-[85%] mx-auto object-contain"
+                    className="mx-auto w-[85%] object-contain"
                   />
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {(data?.images || []).map((i, idx) => (
+                  {(data?.images || []).map((image, idx) => (
                     <button
                       type="button"
-                      key={i?.public_id || idx}
+                      key={image?.public_id || idx}
                       onClick={() => setSelect(idx)}
-                      className={`h-[92px] w-[92px] rounded-xl overflow-hidden border transition ${
-                        select === idx ? "border-black shadow-sm" : "border-gray-200 hover:shadow-sm"
-                      }`}
                       title={`Image ${idx + 1}`}
+                      className={`h-[92px] w-[92px] overflow-hidden rounded-xl border transition ${
+                        select === idx
+                          ? "border-[var(--color-accent-strong)] shadow-sm"
+                          : "border-[var(--color-border)] hover:shadow-sm"
+                      }`}
                     >
-                      <img src={i?.url} alt={`Product ${idx + 1}`} className="h-full w-full object-cover" />
+                      <img src={image?.url} alt={`Product ${idx + 1}`} className="h-full w-full object-cover" />
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Details */}
             <div className="w-full">
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5">
-                <h1 className="text-2xl font-semibold text-gray-900">{data?.name}</h1>
+              <div className="surface-card p-5">
+                <h1 className="text-2xl font-semibold text-[var(--color-text)]">{data?.name}</h1>
 
                 <div className="mt-2 flex flex-wrap items-center gap-3">
                   <div className="flex items-center">
                     <Ratings rating={data?.ratings} />
                   </div>
-                  <span className="text-sm text-gray-500">({data?.reviews?.length || 0} reviews)</span>
-
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
-                    {data?.sold_out || 0} Sold
-                  </span>
-
+                  <span className="text-sm text-[var(--color-muted)]">({data?.reviews?.length || 0} reviews)</span>
+                  <span className="status-chip status-chip--neutral">{data?.sold_out || 0} Sold</span>
                   {Number(data?.stock || 0) > 0 ? (
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
-                      In Stock: {data?.stock}
-                    </span>
+                    <span className="status-chip status-chip--success">In Stock: {data?.stock}</span>
                   ) : (
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 ring-1 ring-rose-200">
-                      Out of Stock
-                    </span>
+                    <span className="status-chip status-chip--danger">Out of Stock</span>
                   )}
                 </div>
 
-                {/* Price */}
                 <div className="mt-5 flex items-end gap-3">
-                  <div className="text-3xl font-bold text-gray-900">Rs. {data?.discountPrice}</div>
+                  <div className="text-3xl font-bold text-[var(--color-text)]">Rs. {data?.discountPrice}</div>
                   {data?.originalPrice ? (
                     <>
-                      <div className="text-lg text-rose-600 line-through">Rs. {data.originalPrice}</div>
-                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800">
+                      <div className="text-lg text-[var(--color-muted)] line-through">Rs. {data.originalPrice}</div>
+                      <span className="status-chip status-chip--muted">
                         {Math.round(((data.originalPrice - data.discountPrice) / data.originalPrice) * 100)}% OFF
                       </span>
                     </>
                   ) : null}
                 </div>
 
-                {/* Description */}
-                <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                <div className="mt-5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] p-4">
+                  <p className="text-sm leading-relaxed text-[var(--color-muted)]">
                     {(data?.description || "").substring(0, 220)}
                     {data?.description?.length > 220 ? "..." : ""}
                   </p>
                 </div>
 
-                {/* Quantity + wishlist */}
                 <div className="mt-5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-gray-700">Quantity</span>
-                    <div className="flex items-center overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    <span className="text-sm font-semibold text-[var(--color-text)]">Quantity</span>
+                    <div className="flex items-center overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
                       <button
                         type="button"
                         onClick={decrementCount}
-                        className="h-10 w-10 grid place-items-center hover:bg-gray-50 transition"
+                        className="grid h-10 w-10 place-items-center transition hover:bg-[var(--color-surface-soft)]"
                       >
                         -
                       </button>
-                      <div className="h-10 min-w-[52px] grid place-items-center font-semibold text-gray-900">
+                      <div className="grid h-10 min-w-[52px] place-items-center font-semibold text-[var(--color-text)]">
                         {count}
                       </div>
                       <button
                         type="button"
                         onClick={incrementCount}
-                        className="h-10 w-10 grid place-items-center hover:bg-gray-50 transition"
+                        className="grid h-10 w-10 place-items-center transition hover:bg-[var(--color-surface-soft)]"
                       >
                         +
                       </button>
@@ -228,57 +213,43 @@ const ProductDetails = ({ data }) => {
 
                   <button
                     type="button"
-                    className="h-11 w-11 rounded-xl border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition"
                     title={click ? "Remove from wishlist" : "Add to wishlist"}
                     onClick={() => (click ? removeFromWishlistHandler() : addToWishlistHandler())}
+                    className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--color-border)] transition hover:bg-[var(--color-surface-soft)]"
                   >
-                    {click ? <AiFillHeart size={24} className="text-rose-600" /> : <AiOutlineHeart size={24} />}
+                    {click ? <AiFillHeart size={24} className="text-[var(--color-accent-strong)]" /> : <AiOutlineHeart size={24} />}
                   </button>
                 </div>
 
-                {/* CTA */}
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={addToCartHandler}
-                    className="h-12 rounded-xl bg-black text-white font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition"
-                  >
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <button type="button" onClick={addToCartHandler} className="btn-primary !h-12">
                     Add to Cart <AiOutlineShoppingCart className="text-xl" />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={buyNowHandler}
-                    className="h-12 rounded-xl border border-gray-200 bg-white text-gray-900 font-semibold hover:bg-gray-50 transition"
-                  >
+                  <button type="button" onClick={buyNowHandler} className="btn-secondary !h-12">
                     Buy Now
                   </button>
                 </div>
 
-                {/* Shop card */}
-                <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-4 flex items-center gap-4">
+                <div className="surface-card-sm mt-6 flex items-center gap-4 p-4">
                   <Link to={`/shop/preview/${data?.shop?._id}`}>
                     <img
                       src={data?.shop?.avatar?.url || "/placeholder.svg"}
                       alt="Shop Logo"
-                      className="w-[56px] h-[56px] rounded-2xl object-cover border border-gray-200"
+                      className="h-[56px] w-[56px] rounded-2xl border border-[var(--color-border)] object-cover"
                     />
                   </Link>
 
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <Link to={`/shop/preview/${data?.shop?._id}`}>
-                      <h3 className="font-semibold text-gray-900 truncate">{data?.shop?.name}</h3>
+                      <h3 className="truncate font-semibold text-[var(--color-text)]">{data?.shop?.name}</h3>
                     </Link>
-                    <p className="text-sm text-gray-500">
-                      {averageRating}/5 • <span className="font-semibold text-gray-900">View Shop</span>
+                    <p className="text-sm text-[var(--color-muted)]">
+                      {averageRating}/5 • <span className="font-semibold text-[var(--color-text)]">View Shop</span>
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleMessageSubmit}
-                    className="h-11 px-4 rounded-xl bg-black text-white text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition"
-                  >
+                  <button type="button" onClick={handleMessageSubmit} className="btn-primary !h-11">
                     <AiOutlineMessage />
                     Message
                   </button>
@@ -305,115 +276,112 @@ const ProductDetailsInfo = ({ data, products, totalReviewsLength, averageRating 
   const [active, setActive] = useState(1)
 
   return (
-    <div className="mt-8 rounded-2xl border border-gray-200 bg-white shadow-sm">
-      {/* Tabs */}
-      <div className="px-4 md:px-6 pt-4">
-        <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+    <div className="surface-card mt-8">
+      <div className="px-4 pt-4 md:px-6">
+        <div className="flex flex-wrap gap-2 border-b border-[var(--color-border)] pb-3">
           {[
             { id: 1, label: "Product Details" },
             { id: 2, label: "Product Reviews" },
             { id: 3, label: "Seller Information" },
-          ].map((t) => (
+          ].map((tab) => (
             <button
-              key={t.id}
+              key={tab.id}
               type="button"
-              onClick={() => setActive(t.id)}
-              className={`h-10 px-4 rounded-xl text-sm font-semibold transition ${
-                active === t.id ? "bg-black text-white" : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+              onClick={() => setActive(tab.id)}
+              className={`h-10 rounded-xl px-4 text-sm font-semibold transition ${
+                active === tab.id
+                  ? "bg-[var(--color-accent-strong)] text-white"
+                  : "bg-[var(--color-surface-soft)] text-[var(--color-text)] hover:bg-[var(--color-accent-soft)]"
               }`}
             >
-              {t.label}
+              {tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4 md:p-6 min-h-[280px]">
+      <div className="min-h-[280px] p-4 md:p-6">
         {active === 1 && (
-          <div className="text-gray-700 leading-relaxed whitespace-pre-line">{data?.description}</div>
+          <div className="whitespace-pre-line leading-relaxed text-[var(--color-muted)]">{data?.description}</div>
         )}
 
         {active === 2 && (
           <div className="space-y-4">
             {data?.reviews?.length ? (
               data.reviews.map((item, idx) => (
-                <div key={idx} className="flex gap-4 p-4 rounded-2xl border border-gray-200 bg-white">
+                <div key={idx} className="surface-card-sm flex gap-4 p-4">
                   <img
                     src={item?.user?.avatar?.url || "/placeholder.svg"}
                     alt="User"
-                    className="w-[54px] h-[54px] rounded-2xl object-cover border border-gray-200"
+                    className="h-[54px] w-[54px] rounded-2xl border border-[var(--color-border)] object-cover"
                   />
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">{item?.user?.name}</h3>
+                      <h3 className="font-semibold text-[var(--color-text)]">{item?.user?.name}</h3>
                       <Ratings rating={item?.rating} />
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-[var(--color-muted)]">
                         {item?.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-gray-700">{item?.comment}</p>
+                    <p className="mt-2 text-sm text-[var(--color-muted)]">{item?.comment}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="py-12 text-center rounded-2xl border border-gray-200 bg-gray-50">
-                <h3 className="text-lg font-semibold text-gray-900">No Reviews Yet</h3>
-                <p className="mt-2 text-sm text-gray-500">Be the first to review this product!</p>
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] py-12 text-center">
+                <h3 className="text-lg font-semibold text-[var(--color-text)]">No Reviews Yet</h3>
+                <p className="mt-2 text-sm text-[var(--color-muted)]">Be the first to review this product!</p>
               </div>
             )}
           </div>
         )}
 
         {active === 3 && (
-          <div className="grid grid-cols-1 800px:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 800px:grid-cols-2">
             <div>
               <Link to={`/shop/preview/${data?.shop?._id}`}>
                 <div className="flex items-center gap-4">
                   <img
                     src={data?.shop?.avatar?.url || "/placeholder.svg"}
-                    className="w-[86px] h-[86px] rounded-2xl object-cover border border-gray-200"
+                    className="h-[86px] w-[86px] rounded-2xl border border-[var(--color-border)] object-cover"
                     alt="Shop Logo"
                   />
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">{data?.shop?.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-gray-600">{averageRating}/5</span>
+                    <h3 className="text-xl font-semibold text-[var(--color-text)]">{data?.shop?.name}</h3>
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-[var(--color-muted)]">{averageRating}/5</span>
                       <Ratings rating={Number.parseFloat(averageRating)} />
                     </div>
                   </div>
                 </div>
               </Link>
 
-              <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                <p className="text-sm text-gray-700">{data?.shop?.description}</p>
+              <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] p-4">
+                <p className="text-sm text-[var(--color-muted)]">{data?.shop?.description}</p>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="surface-card-sm p-4">
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Joined on</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-[var(--color-muted)]">Joined on</span>
+                  <span className="font-semibold text-[var(--color-text)]">
                     {data?.shop?.createdAt ? new Date(data.shop.createdAt).toLocaleDateString() : "-"}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Total Products</span>
-                  <span className="font-semibold text-gray-900">{products?.length || 0}</span>
+                  <span className="text-[var(--color-muted)]">Total Products</span>
+                  <span className="font-semibold text-[var(--color-text)]">{products?.length || 0}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Total Reviews</span>
-                  <span className="font-semibold text-gray-900">{totalReviewsLength || 0}</span>
+                  <span className="text-[var(--color-muted)]">Total Reviews</span>
+                  <span className="font-semibold text-[var(--color-text)]">{totalReviewsLength || 0}</span>
                 </div>
 
                 <Link to={`/shop/preview/${data?.shop?._id}`}>
-                  <button
-                    type="button"
-                    className="mt-3 w-full h-11 rounded-xl bg-black text-white font-semibold hover:opacity-90 transition"
-                  >
+                  <button type="button" className="btn-primary mt-3 !h-11 !w-full">
                     Visit Shop
                   </button>
                 </Link>

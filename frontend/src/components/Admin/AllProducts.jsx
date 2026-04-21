@@ -80,12 +80,12 @@ const AllProducts = () => {
       flex: 1.4,
       renderCell: (params) => (
         <div className="flex items-center gap-2">
-          <span className="h-9 w-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-900">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-soft)] text-[var(--color-accent-strong)]">
             <FiPackage size={18} />
           </span>
           <div className="leading-tight">
-            <div className="font-semibold text-gray-900">{params.value}</div>
-            <div className="text-xs text-gray-500">Listed product</div>
+            <div className="font-semibold text-[var(--color-text)]">{params.value}</div>
+            <div className="text-xs text-[var(--color-muted)]">Listed product</div>
           </div>
         </div>
       ),
@@ -99,7 +99,7 @@ const AllProducts = () => {
       type: "number",
       valueFormatter: (p) => `Rs. ${p.value}`,
       renderCell: (params) => (
-        <span className="font-semibold text-gray-900">Rs. {params.value}</span>
+        <span className="font-semibold text-[var(--color-text)]">Rs. {params.value}</span>
       ),
     },
 
@@ -111,20 +111,14 @@ const AllProducts = () => {
       type: "number",
       renderCell: (params) => {
         const v = Number(params.value || 0)
-        const cls =
-          v === 0
-            ? "bg-rose-50 text-rose-700 ring-1 ring-rose-200"
-            : v < 10
-              ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
-              : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
         const label = v === 0 ? "Out" : v < 10 ? "Low" : "In stock"
 
         return (
           <div className="flex items-center gap-2">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${cls}`}>
+            <span className={v === 0 ? "status-chip status-chip--danger" : v < 10 ? "status-chip status-chip--muted" : "status-chip status-chip--success"}>
               {label}
             </span>
-            <span className="text-sm font-semibold text-gray-900">{v}</span>
+            <span className="text-sm font-semibold text-[var(--color-text)]">{v}</span>
           </div>
         )
       },
@@ -137,7 +131,7 @@ const AllProducts = () => {
       flex: 0.6,
       type: "number",
       renderCell: (params) => (
-        <span className="font-medium text-gray-700">{params.value}</span>
+        <span className="font-medium text-[var(--color-muted)]">{params.value}</span>
       ),
     },
 
@@ -149,8 +143,8 @@ const AllProducts = () => {
       sortable: false,
       renderCell: (params) => (
         <Link to={`/product/${params.id}`}>
-          <Button className="!min-w-[40px] !h-[40px] !rounded-xl !p-0 hover:!bg-gray-100">
-            <AiOutlineEye size={20} className="text-gray-900" />
+          <Button className="!min-w-[40px] !h-[40px] !rounded-xl !p-0 hover:!bg-[var(--color-surface-soft)]">
+            <AiOutlineEye size={20} className="text-[var(--color-text)]" />
           </Button>
         </Link>
       ),
@@ -165,9 +159,9 @@ const AllProducts = () => {
       renderCell: (params) => (
         <Button
           onClick={() => handleDelete(params.id)}
-          className="!min-w-[40px] !h-[40px] !rounded-xl !p-0 hover:!bg-rose-50"
+          className="!min-w-[40px] !h-[40px] !rounded-xl !p-0 hover:!bg-[var(--color-accent-soft)]"
         >
-          <AiOutlineDelete size={20} className="text-rose-600" />
+          <AiOutlineDelete size={20} className="text-[var(--color-accent-strong)]" />
         </Button>
       ),
     },
@@ -200,25 +194,25 @@ const AllProducts = () => {
       ) : (
         <div className="w-full p-4 md:p-6">
           {/* GlamCart Header */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm mb-5">
+          <div className="surface-card mb-5">
             <div className="px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="text-[22px] md:text-[26px] font-semibold text-gray-900">
+                <h2 className="text-[22px] md:text-[26px] font-semibold text-[var(--color-text)]">
                   All Products
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="mt-1 text-sm text-[var(--color-muted)]">
                   Manage your listings, stock, and pricing quickly.
                 </p>
 
                 {/* Stats chips */}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                  <span className="status-chip status-chip--neutral">
                     Total: {totalCount}
                   </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                  <span className="status-chip status-chip--muted">
                     Low stock: {lowCount}
                   </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 ring-1 ring-rose-200">
+                  <span className="status-chip status-chip--danger">
                     Out of stock: {outCount}
                   </span>
                 </div>
@@ -227,7 +221,7 @@ const AllProducts = () => {
               <div className="flex gap-2">
                 <Link
                   to="/dashboard-create-product"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-black text-white hover:opacity-90 text-sm font-semibold transition"
+                  className="btn-primary"
                 >
                   <FiPlus size={16} />
                   Add Product
@@ -239,13 +233,13 @@ const AllProducts = () => {
             <div className="px-5 pb-5 md:px-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="md:col-span-2">
-                  <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 h-12">
-                    <FiSearch className="text-gray-500" />
+                  <div className="flex h-12 items-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4">
+                    <FiSearch className="text-[var(--color-muted)]" />
                     <input
                       value={q}
                       onChange={(e) => setQ(e.target.value)}
                       placeholder="Search by product name or ID..."
-                      className="w-full outline-none bg-transparent text-sm text-gray-900 placeholder:text-gray-400"
+                      className="w-full bg-transparent text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-muted)]"
                     />
                   </div>
                 </div>
@@ -254,7 +248,7 @@ const AllProducts = () => {
                   <select
                     value={stockFilter}
                     onChange={(e) => setStockFilter(e.target.value)}
-                    className="w-full h-12 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none"
+                    className="field-select !min-h-[48px]"
                   >
                     <option value="all">All stock</option>
                     <option value="in">In stock (10+)</option>
@@ -267,18 +261,18 @@ const AllProducts = () => {
           </div>
 
           {/* Table */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="surface-card overflow-hidden">
             <div className="px-5 py-4 md:px-6 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Product List</h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <h3 className="text-lg font-semibold text-[var(--color-text)]">Product List</h3>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">
                   Showing {rows.length} of {totalCount}
                 </p>
               </div>
             </div>
 
             <div className="px-2 md:px-4 pb-4">
-              <div className="rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="surface-card-sm overflow-hidden bg-white">
                 <DataGrid
                   rows={rows}
                   columns={columns}
@@ -290,7 +284,7 @@ const AllProducts = () => {
               </div>
 
               {rows.length === 0 && (
-                <div className="px-4 py-10 text-center text-sm text-gray-500">
+                <div className="px-4 py-10 text-center text-sm text-[var(--color-muted)]">
                   No products found. Try another search or add a new product.
                 </div>
               )}

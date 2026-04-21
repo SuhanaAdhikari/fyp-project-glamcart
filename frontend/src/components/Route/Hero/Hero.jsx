@@ -1,165 +1,125 @@
-import React, { useEffect, useMemo, useState } from "react"
-import styles from "../../../styles/styles"
-import { Link } from "react-router-dom"
-import { FaShoppingBag } from "react-icons/fa"
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import { server } from "../../../server";
+
+const heroStats = [
+  { label: "Curated categories", value: "10+" },
+  { label: "Popular products", value: "500+" },
+  { label: "Simple checkout", value: "3 steps" },
+];
 
 const Hero = () => {
-  // ✅ GlamCart words (not footwear)
-  const words = useMemo(
-    () => ["Glam Essentials", "Beauty Picks", "New Arrivals"],
-    []
-  )
-
-  const [index, setIndex] = useState(0)
+  const [bannerUrl, setBannerUrl] = useState("");
+  const [isLoadingBanner, setIsLoadingBanner] = useState(true);
 
   useEffect(() => {
-    const t = setInterval(() => {
-      setIndex((p) => (p + 1) % words.length)
-    }, 2200)
-    return () => clearInterval(t)
-  }, [words.length])
+    let isMounted = true;
+
+    const getBanner = async () => {
+      try {
+        const { data } = await axios.get(`${server}/banner/get-banner`);
+
+        if (isMounted) {
+          setBannerUrl(data?.banner?.image?.url || "");
+        }
+      } catch (error) {
+        if (isMounted) {
+          setBannerUrl("");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingBanner(false);
+        }
+      }
+    };
+
+    getBanner();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
-    <section
-      className={`relative w-full h-[90vh] min-h-[620px] flex items-center overflow-hidden ${styles.normalFlex}`}
-      style={{
-        backgroundImage: "var(--hero-bg)", // ✅ global hero image
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      {/* Strong glam overlay (high contrast) */}
-      <div className="absolute inset-0 bg-black/80" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#15001f]/90 via-black/70 to-black/35" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+    <section className="section-shell pt-6 md:pt-8">
+      <div className="hero-shell">
+        <div className="grid min-h-full gap-10 p-6 md:p-8 lg:grid-cols-[0.95fr_1.05fr] lg:p-12 xl:p-14">
+          <div className="relative z-10 flex flex-col justify-center">
+            <span className="eyebrow">Clean layout, fuller screen, better shopping flow</span>
+            <h1 className="section-heading mt-6 max-w-3xl">
+              Explore beauty essentials in a layout that feels premium, open and easier to use.
+            </h1>
+            <p className="section-copy mt-6 max-w-2xl text-[15px] md:text-[17px]">
+              GlamCart now uses the screen better with wider sections, stronger hierarchy and a softer modern theme that still stays clean.
+            </p>
 
-      {/* Brand glow blobs */}
-      <div className="absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full bg-pink-500/35 blur-3xl" />
-      <div className="absolute -bottom-36 -right-36 w-[580px] h-[580px] rounded-full bg-violet-500/35 blur-3xl" />
-
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 md:px-12">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow">
-          <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-pink-500 to-violet-600" />
-          <span className="text-white text-sm font-semibold tracking-wide">
-            GlamCart • Premium Picks
-          </span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="mt-7 text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] text-white drop-shadow-[0_12px_40px_rgba(0,0,0,0.85)]">
-          <span className="block text-white/90">Discover</span>
-
-          {/* ✅ Always visible (no clipping/translate). Unique animation. */}
-          <span className="relative block mt-3">
-            <span
-              key={index} // ✅ forces animation replay each word
-              className="
-                inline-block
-                text-transparent bg-clip-text
-                bg-gradient-to-r from-pink-300 via-fuchsia-200 to-violet-200
-                drop-shadow-[0_10px_35px_rgba(0,0,0,0.6)]
-                animate-[glamWordIn_2.2s_ease-in-out_infinite]
-              "
-            >
-              {words[index]}
-            </span>
-
-            {/* Underline */}
-            <span
-              className="
-                block mt-4
-                h-[6px] w-[280px] md:w-[380px]
-                rounded-full
-                bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600
-                shadow-[0_10px_30px_rgba(236,72,153,0.35)]
-                animate-[glamUnderline_2.2s_ease-in-out_infinite]
-              "
-            />
-          </span>
-        </h1>
-
-        {/* Description */}
-        <p className="mt-7 max-w-[720px] text-base md:text-lg text-white/90 leading-relaxed">
-          <span className="font-bold text-white">GlamCart</span> brings you curated fashion and beauty essentials. Shop
-          best sellers, explore new drops, and upgrade your style — all in one destination.
-        </p>
-
-        {/* CTAs */}
-        <div className="mt-10 flex flex-col sm:flex-row gap-4">
-          <Link to="/products">
-            <div
-              className="
-                group inline-flex items-center gap-3
-                px-7 py-4 rounded-2xl
-                bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-600
-                shadow-[0_18px_55px_rgba(236,72,153,0.45)]
-                hover:shadow-[0_22px_75px_rgba(168,85,247,0.55)]
-                hover:-translate-y-1
-                transition-all duration-300
-                border border-white/15
-              "
-            >
-              <span className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur">
-                <FaShoppingBag size={20} className="text-white group-hover:scale-110 transition-transform" />
-              </span>
-              <span className="text-white font-semibold text-[16px] tracking-wide">
-                Shop Now
-              </span>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/products" className="btn-primary">
+                Shop now
+              </Link>
+              <Link to="/offers" className="btn-secondary">
+                Browse offers
+              </Link>
             </div>
-          </Link>
 
-          <Link to="/offers">
-            <div
-              className="
-                inline-flex items-center justify-center
-                px-7 py-4 rounded-2xl
-                bg-white/10 backdrop-blur-md
-                border border-white/25
-                text-white font-semibold text-[16px]
-                hover:bg-white/15
-                transition-all duration-300
-              "
-            >
-              View Offers
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              {heroStats.map((item) => (
+                <div key={item.label} className="floating-card p-4">
+                  <p className="text-2xl font-extrabold text-[#17212b]">{item.value}</p>
+                  <p className="mt-1 text-sm text-[#687280]">{item.label}</p>
+                </div>
+              ))}
             </div>
-          </Link>
-        </div>
+          </div>
 
-        {/* Trust strip */}
-        <div className="mt-10">
-          <div className="inline-flex flex-wrap items-center gap-6 px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/25 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
-            {["Fast Delivery", "Easy Returns", "Secure Payments"].map((t) => (
-              <span key={t} className="text-white font-semibold text-sm flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 flex items-center justify-center text-[12px]">
-                  ✓
-                </span>
-                {t}
-              </span>
-            ))}
+          <div className="relative flex items-center justify-center lg:justify-end">
+            <div className="accent-panel absolute bottom-[12%] left-[4%] right-[18%] top-[12%] rounded-[32px]" />
+
+            <div className="relative z-10 w-full max-w-[920px]">
+              <div className="overflow-hidden rounded-[32px] border border-[#dfd2c4] bg-white shadow-[0_24px_60px_rgba(23,33,43,0.14)]">
+                {isLoadingBanner ? (
+                  <div className="h-[420px] w-full animate-pulse bg-[var(--color-panel)] md:h-[560px] xl:h-[660px]" />
+                ) : bannerUrl ? (
+                  <img
+                    src={bannerUrl}
+                    alt="GlamCart homepage banner"
+                    className="h-[420px] w-full object-cover md:h-[560px] xl:h-[660px]"
+                  />
+                ) : (
+                  <div className="flex h-[420px] w-full flex-col items-center justify-center bg-[var(--color-panel)] px-6 text-center md:h-[560px] xl:h-[660px]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent-strong)]">
+                      Admin-managed banner
+                    </p>
+                    <h3 className="mt-4 text-2xl font-bold text-[var(--color-text)] md:text-3xl">
+                      The homepage banner will appear here after admin upload.
+                    </h3>
+                    <p className="mt-3 max-w-lg text-sm text-[var(--color-muted)] md:text-base">
+                      The old hardcoded hero image has been removed. Upload a banner from the admin panel to make this section live.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {bannerUrl && (
+                <>
+                  <div className="floating-card absolute bottom-5 left-5 max-w-[240px] p-4 md:bottom-8 md:left-8">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#885e4a]">Featured pick</p>
+                    <p className="mt-2 text-lg font-bold text-[#17212b]">Simple beauty shopping with stronger visuals</p>
+                  </div>
+
+                  <div className="floating-card absolute right-4 top-4 p-4 md:right-8 md:top-8">
+                    <p className="text-sm text-[#687280]">Used screen space</p>
+                    <p className="mt-1 text-2xl font-extrabold text-[#17212b]">Full width</p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Keyframes */}
-      <style>{`
-        @keyframes glamWordIn {
-          0%   { opacity: 0; transform: translateY(18px); filter: blur(2px); }
-          18%  { opacity: 1; transform: translateY(0px);  filter: blur(0px); }
-          78%  { opacity: 1; transform: translateY(0px);  filter: blur(0px); }
-          100% { opacity: 0; transform: translateY(-12px); filter: blur(2px); }
-        }
-
-        @keyframes glamUnderline {
-          0%   { transform: scaleX(0.15); transform-origin: left; opacity: .35; }
-          35%  { transform: scaleX(1);    transform-origin: left; opacity: .95; }
-          70%  { transform: scaleX(1);    transform-origin: right; opacity: .85; }
-          100% { transform: scaleX(0.15); transform-origin: right; opacity: .35; }
-        }
-      `}</style>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

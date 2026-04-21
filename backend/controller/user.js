@@ -13,6 +13,13 @@ const { isAuthenticated, isAdmin } = require("../middleware/auth");
 router.post("/create-user", async (req, res, next) => {
   try {
     const { name, email, password, avatar } = req.body;
+
+    if (!name || !email || !password) {
+      return next(new ErrorHandler("Please provide all required fields", 400));
+    }
+    if (!avatar) {
+      return next(new ErrorHandler("Please upload an avatar image", 400));
+    }
     const userEmail = await User.findOne({ email });
 
     if (userEmail) {
@@ -48,6 +55,13 @@ router.post("/create-user", async (req, res, next) => {
         message: `please check your email:- ${user.email} to activate your account!`,
       });
     } catch (error) {
+      if (process.env.NODE_ENV !== "PRODUCTION") {
+        return res.status(201).json({
+          success: true,
+          message: "Email service not available in dev. Use activationUrl to activate.",
+          activationUrl,
+        });
+      }
       return next(new ErrorHandler(error.message, 500));
     }
   } catch (error) {
@@ -164,7 +178,8 @@ router.get(
         expires: new Date(Date.now()),
         httpOnly: true,
         sameSite: "none",
-        secure: true,
+        secure: process.env.NODE_ENV === "PRODUCTION",
+        path: "/",
       });
       res.status(201).json({
         success: true,

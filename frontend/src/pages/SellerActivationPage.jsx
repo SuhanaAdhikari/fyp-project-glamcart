@@ -1,26 +1,26 @@
-// pages/SellerActivationPage.jsx
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { server } from "../server";
+import React from "react";
+import { Link } from "react-router-dom";
 
 const SellerActivationPage = () => {
-  const { activation_token } = useParams();
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (activation_token) {
-      axios.get(`${server}/shop/activation/${activation_token}`)
-        .then(() => setError(false))
-        .catch(() => setError(true));
-    }
-  }, [activation_token]);
-
   return (
-    <div className="flex items-center justify-center h-screen">
-      <p className="text-xl font-semibold">
-        {error ? "Token expired or invalid!" : "Seller account activated successfully!"}
-      </p>
+    <div className="page-shell flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="surface-card w-full max-w-xl p-8 text-center">
+        <span className="eyebrow">Seller registration</span>
+        <h1 className="section-heading mt-5 text-[2rem]">Activation links are no longer used</h1>
+        <p className="section-copy mt-3">
+          Register your shop normally, then wait for admin approval. You can log in only after the admin approves
+          your seller account.
+        </p>
+
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <Link to="/shop-create" className="btn-primary">
+            Create shop
+          </Link>
+          <Link to="/shop-login" className="btn-secondary">
+            Seller login
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

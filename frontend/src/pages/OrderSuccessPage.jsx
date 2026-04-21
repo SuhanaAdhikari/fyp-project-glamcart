@@ -1,36 +1,31 @@
 import React from "react";
-import Footer from "../components/Layout/Footer";
+import { Link } from "react-router-dom";
 import Header from "../components/Layout/Header";
-import Lottie from "react-lottie";
-import animationData from "../Assests/animations/107043-success.json";
+import Footer from "../components/Layout/Footer";
 
 const OrderSuccessPage = () => {
   return (
-    <div>
+    <div className="page-shell">
       <Header />
-      <Success />
-      <Footer />
-    </div>
-  );
-};
+      <section className="section-shell py-12">
+        <div className="surface-card mx-auto max-w-2xl p-10 text-center">
+          <span className="eyebrow">Order complete</span>
+          <h1 className="section-heading mt-5">Your order was placed successfully</h1>
+          <p className="section-copy mt-4">
+            The order has been saved and you can continue shopping or review your account for order updates.
+          </p>
 
-const Success = () => {
-  const defaultOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-  return (
-    <div>
-      <Lottie options={defaultOptions} width={300} height={300} />
-      <h5 className="text-center mb-14 text-[25px] text-[#000000a1]">
-        Your order is successful 😍
-      </h5>
-      <br />
-      <br />
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link to="/products" className="btn-primary">
+              Continue shopping
+            </Link>
+            <Link to="/profile" className="btn-secondary">
+              View account
+            </Link>
+          </div>
+        </div>
+      </section>
+      <Footer />
     </div>
   );
 };

@@ -32,6 +32,13 @@ const shopSchema = new mongoose.Schema({
     type: String,
     default: "Seller",
   },
+  isApproved: {
+    type: Boolean,
+    default: false,
+  },
+  approvedAt: {
+    type: Date,
+  },
   avatar: {
     public_id: {
       type: String,

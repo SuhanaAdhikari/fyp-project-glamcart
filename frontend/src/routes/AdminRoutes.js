@@ -5,6 +5,8 @@ import AdminDashboardOrders from "../pages/AdminDashboardOrders";
 import AdminDashboardProducts from "../pages/AdminDashboardProducts";
 import AdminDashboardEvents from "../pages/AdminDashboardEvents";
 import AdminDashboardWithdraw from "../pages/AdminDashboardWithdraw";
+import AdminVendorApprovals from "../pages/AdminVendorApprovals";
+import AdminDashboardBanner from "../pages/AdminDashboardBanner";
 
 export {
   AdminDashboardPage,
@@ -13,5 +15,7 @@ export {
   AdminDashboardOrders,
   AdminDashboardProducts,
   AdminDashboardEvents,
-  AdminDashboardWithdraw
+  AdminDashboardWithdraw,
+  AdminVendorApprovals,
+  AdminDashboardBanner
 };

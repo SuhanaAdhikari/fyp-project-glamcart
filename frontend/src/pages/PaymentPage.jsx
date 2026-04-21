@@ -1,22 +1,25 @@
-import React from 'react'
-import CheckoutSteps from '../components/Checkout/CheckoutSteps'
-import Footer from '../components/Layout/Footer'
-import Header from '../components/Layout/Header'
+import React from "react";
+import Header from "../components/Layout/Header";
+import Footer from "../components/Layout/Footer";
+import CheckoutSteps from "../components/Checkout/CheckoutSteps";
 import Payment from "../components/Payment/Payment";
+import { Elements } from "@stripe/react-stripe-js";
 
-const PaymentPage = () => {
+const PaymentPage = ({ stripePromise }) => {
   return (
-    <div className='w-full min-h-screen bg-[#f6f9fc]'>
-       <Header />
-       <br />
-       <br />
-       <CheckoutSteps active={2} />
-       <Payment />
-       <br />
-       <br />
-       <Footer />
+    <div className="page-shell">
+      <Header />
+      <CheckoutSteps active={2} />
+      {stripePromise ? (
+        <Elements stripe={stripePromise}>
+          <Payment stripePromise={stripePromise} />
+        </Elements>
+      ) : (
+        <Payment stripePromise={stripePromise} />
+      )}
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default PaymentPage
+export default PaymentPage;
